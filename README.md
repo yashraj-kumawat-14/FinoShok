@@ -1,0 +1,2 @@
+# finoshok
+custom finance software
