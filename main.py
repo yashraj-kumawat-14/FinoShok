@@ -16,8 +16,19 @@ yellow = "yellow"
 class login:
     #here is constructor which takes a window object like login_window
     def __init__(self, login_window):
-        # global result
+        #initail value of result is set to false
         login_window.result = False
+        
+        #getting the display's and login_window  widhth and height
+        login_window.update() #update ensures that the window has been updated to its actual size before you attempt to calculate the center coordinates.
+
+        screenWidth = login_window.winfo_screenwidth()
+        screenHeight = login_window.winfo_screenheight()
+        x = (screenWidth-login_window.winfo_width())//2
+        y = (screenHeight-login_window.winfo_height())//2
+        
+        #setting the position of login window to center of display
+        login_window.geometry(f"+{x}+{y}")
         mainFrame = Frame(login_window, bg=black)
         mainFrame.pack(fill=BOTH, expand=True)
 
@@ -65,6 +76,7 @@ login_window = Tk()
 login_window.title("Login")
 login_window.geometry("200x200")
 login_window.resizable(False, False)
+
 login(login_window)
 login_window.mainloop()
 
