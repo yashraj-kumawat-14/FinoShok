@@ -1,153 +1,97 @@
 #importing necessary modules
 from tkinter import *
 from tkinter import ttk
-import tkinter.messagebox as message
-import mysql.connector as mysql
+# import mysql.connector as mysql
+from login import login
 
-#colors used in gui
-mainFrameColor = "grey"
-statusBarColor = "red"
-toolFrameColor = "green"
-black = "black"
-yellow = "yellow"
 
-#here i made a login using which you can create a window containing a login page
+class finoshok:
+    def __init__(self, root):
+        #colors used in gui
+        mainFrameColor = "grey"
+        statusBarColor = "red"
+        toolFrameColor = "green"
+        #making a menubar
+        mainMenubar = Menu(root)
+        mainMenubar.add_command(label="hello")
+        #making submenubarss
+        submenu = Menu(mainMenubar, tearoff=0)
+        submenu.add_command(label="raj")
+        submenu.add_checkbutton(label="rajj")
 
-class login:
-    #here is constructor which takes a window object like login_window
-    def __init__(self, login_window):
-        #initail value of result is set to false
-        login_window.result = False
-        
-        #getting the display's and login_window  widhth and height
-        login_window.update() #update ensures that the window has been updated to its actual size before you attempt to calculate the center coordinates.
+        #adding submenu in mainmenybar
+        mainMenubar.add_cascade(menu=submenu, label="gile")
 
-        screenWidth = login_window.winfo_screenwidth()
-        screenHeight = login_window.winfo_screenheight()
-        x = (screenWidth-login_window.winfo_width())//2
-        y = (screenHeight-login_window.winfo_height())//2
-        
-        #setting the position of login window to center of display
-        login_window.geometry(f"+{x}+{y}")
-        mainFrame = Frame(login_window, bg=black)
-        mainFrame.pack(fill=BOTH, expand=True)
+        #configuring the menu in root as mainmenubar
+        root.config(menu=mainMenubar)
 
-        mainFrame.rowconfigure(0, weight=1)
-        mainFrame.columnconfigure(0, weight=1)
+        #creating toolFrame in root
 
-        centerFrame = Frame(mainFrame, bg=black)
-        centerFrame.grid(row=0, column=0)
+        toolFrame = Frame(root, bg=toolFrameColor)
+        toolFrame.pack(side="left", fill="y")
 
-        innerFrame = Frame(centerFrame, bg=black)
-        innerFrame.pack()
+        #CREATING main frame in root
 
-        userLabel = Label(innerFrame, text="Username : ", bg=black, fg=yellow)
-        userLabel.grid(row=0, column=0)
-        password = Label(innerFrame, text="Password : ", bg=black, fg=yellow)
-        password.grid(row=1, column=0)
+        mainFrame = Frame(root, bg=mainFrameColor)
+        mainFrame.pack(fill="both", expand=True)
 
-        self.userVar = StringVar()
-        self.passwordVar = StringVar()
-        
-        userEntry = Entry(innerFrame, textvariable=self.userVar)
-        userEntry.grid(row=0, column=1)
-        passwordEntry = Entry(innerFrame, textvariable=self.passwordVar, state='normal')
-        passwordEntry.grid(row=1, column=1)
+        #creating a notebook of tabs in mainframe
 
-        loginButton = Button(centerFrame, text="login", bg=black, fg=yellow, command=self.loginCheck)
-        loginButton.pack(pady=20)
+        my_notebook = ttk.Notebook(mainFrame)
+        my_notebook.pack(fill="both", expand=True)
 
-    #here this function checks if the user and password matches in the users table
-    def loginCheck(self):
-        # global result
-        conn = mysql.connect(host="localhost", user="root", password="1234", database="users")
-        cursorobject = conn.cursor()
-        cursorobject.execute("select * from users where user = '{}' and password = '{}'".format(self.userVar.get(), self.passwordVar.get()))
-        login_window.userDetail = cursorobject.fetchone()
-        if(login_window.userDetail):
-            login_window.result = True
-            login_window.destroy()
-        else:
-            login_window.result=False            
+        #creating tabs in notebook
 
-#here i created a demo window to pass to class login 
+        tab1 = Frame(my_notebook, bg=mainFrameColor)
+        tab2 = Frame(my_notebook, bg=toolFrameColor)
+        tab1.pack(fill="both", expand=True)
+        tab2.pack(fill="both", expand=True)
 
-login_window = Tk()
-login_window.title("Login")
-login_window.geometry("200x200")
-login_window.resizable(False, False)
-
-login(login_window)
-login_window.mainloop()
-
-# checking if the credentials are correct
-if(login_window.result):
-    
-    #initiating the gui
-    root = Tk()
-    root.geometry("400x400")
-    root.title("finoshok")
-
-    #making a menubar
-    mainMenubar = Menu(root)
-    mainMenubar.add_command(label="hello")
-    #making submenubarss
-    submenu = Menu(mainMenubar, tearoff=0)
-    submenu.add_command(label="raj")
-    submenu.add_checkbutton(label="rajj")
-
-    #adding submenu in mainmenybar
-    mainMenubar.add_cascade(menu=submenu, label="gile")
-
-    #configuring the menu in root as mainmenubar
-    root.config(menu=mainMenubar)
-
-    #creating toolFrame in root
-
-    toolFrame = Frame(root, bg=toolFrameColor)
-    toolFrame.pack(side="left", fill="y")
-
-    #CREATING main frame in root
-
-    mainFrame = Frame(root, bg=mainFrameColor)
-    mainFrame.pack(fill="both", expand=True)
-
-    #creating a notebook of tabs in mainframe
-
-    my_notebook = ttk.Notebook(mainFrame)
-    my_notebook.pack(fill="both", expand=True)
-
-    #creating tabs in notebook
-
-    tab1 = Frame(my_notebook, bg=mainFrameColor)
-    tab2 = Frame(my_notebook, bg=toolFrameColor)
-    tab1.pack(fill="both", expand=True)
-    tab2.pack(fill="both", expand=True)
-
-    my_notebook.add(tab1, text="yashraj")
-    my_notebook.add(tab2, text="kumawat")
-
-    #navigation buttons for tabs
-    def hide():
-        my_notebook.hide(1)
-    def show():
+        my_notebook.add(tab1, text="yashraj")
         my_notebook.add(tab2, text="kumawat")
-    def select():
-        my_notebook.select(1)
+
+        #navigation buttons for tabs
+        def hide():
+            my_notebook.hide(1)
+        def show():
+            my_notebook.add(tab2, text="kumawat")
+        def select():
+            my_notebook.select(1)
 
 
-    hideButton = Button(tab1, text="hide tab 2", command=hide)
-    hideButton.pack()
+        hideButton = Button(tab1, text="hide tab 2", command=hide)
+        hideButton.pack()
 
-    showButton = Button(tab1, text="show tab 2", command=show)
-    showButton.pack()
+        showButton = Button(tab1, text="show tab 2", command=show)
+        showButton.pack()
 
-    selectButton = Button(tab1, text="select tab 2", command=select)
-    selectButton.pack()
+        selectButton = Button(tab1, text="select tab 2", command=select)
+        selectButton.pack()
 
-    #creating a status bar
-    statusBar = Frame(root, bg=statusBarColor)
-    statusBar.pack(side="bottom", fill="x")
+        #creating a status bar
+        statusBar = Frame(root, bg=statusBarColor)
+        statusBar.pack(side="bottom", fill="x")
 
 
-    root.mainloop()
+
+
+if __name__=="__main__":
+    #login window 
+    login_window = Tk()
+    login_window.title("Login")
+    login_window.geometry("200x200")
+    login_window.resizable(False, False)
+    
+    #passing login_window to login class to make working login window
+    login(login_window)
+    login_window.mainloop()
+
+    # checking if the credentials are correct
+    if(login_window.result):
+        #initiating the gui
+        root = Tk()
+        root.geometry("400x400")
+        root.title("finoshok")
+        finoshok(root)
+
+        root.mainloop()
