@@ -1,9 +1,8 @@
 #importing necessary modules
 from tkinter import *
 from tkinter import ttk
-# import mysql.connector as mysql
-from login import login
-
+from login import Login
+from calculator import Calculator
 
 class finoshok:
     def __init__(self, root):
@@ -29,6 +28,11 @@ class finoshok:
 
         toolFrame = Frame(root, bg=toolFrameColor)
         toolFrame.pack(side="left", fill="y")
+
+        calculatorFrame = Frame(toolFrame, bg=toolFrameColor)
+        calculatorFrame.pack(side="bottom")
+
+        Calculator(calculatorFrame)
 
         #CREATING main frame in root
 
@@ -83,7 +87,7 @@ if __name__=="__main__":
     login_window.resizable(False, False)
     
     #passing login_window to login class to make working login window
-    login(login_window)
+    Login(login_window)
     login_window.mainloop()
 
     # checking if the credentials are correct

@@ -1,29 +1,10 @@
 from tkinter import *
 import mysql.connector as mysql
 
-black = "black"
-white = "white"
-red = "red"
-green = "green"
-blue = "blue"
-yellow = "yellow"
-orange = "orange"
-purple = "purple"
-pink = "pink"
-brown = "brown"
-grey = "grey"
-cyan = "cyan"
-magenta = "magenta"
-lime = "lime"
-maroon = "maroon"
-navy = "navy"
-olive = "olive"
-silver = "silver"
-teal = "teal"
 
 #here i made a login using which you can create a window containing a login page
 
-class login:
+class Login:
     #here is constructor which takes a window object like login_window
     def __init__(self, login_window):
         black = "black"
@@ -94,5 +75,5 @@ if __name__=="__main__":
     login_window.title("Login")
     login_window.geometry("200x200")
     login_window.resizable(False, False)
-    login(login_window)
+    Login(login_window)
     login_window.mainloop()
