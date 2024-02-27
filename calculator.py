@@ -113,7 +113,7 @@ class Calculator:
         elif(event.keysym == "Return"):
             self.ans(self.displayVar)
         else:
-            print(event.keysym)
+            pass
     #this function displays the entry of previous result and the operations or numbers sum as a string on the display
     def operationAndNum(self, operationName, displayVar):
         if operationName=="C":

@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from login import Login
 from calculator import Calculator
+from notepad import Notepad
 
 class finoshok:
     def __init__(self, root):
@@ -29,14 +30,22 @@ class finoshok:
         toolFrame = Frame(root, bg=toolFrameColor)
         toolFrame.pack(side="left", fill="y")
 
-        calculatorFrame = Frame(toolFrame, bg=toolFrameColor)
-        calculatorFrame.pack(side="bottom")
+        noteFrame = Frame(toolFrame, bg=toolFrameColor, borderwidth=2, relief="groove")
+        noteFrame.pack(side="top", fill="both", expand=True)
 
+        calculatorFrame = Frame(toolFrame, bg=toolFrameColor, borderwidth=2, relief="groove")
+        calculatorFrame.pack(side="bottom")
+        
+
+        #binding widgets to keyBoardHandler for key event
         calc = Calculator(calculatorFrame)
         root.bind("<Key>", calc.keyBoardHandler)
         for child in root.winfo_children():
             child.bind("<Key>", calc.keyBoardHandler)
-        # root.bind("<key>", calc.)
+
+        #create mini notepad
+        notepad = Notepad(noteFrame, 200, 200)
+
         #CREATING main frame in root
 
         mainFrame = Frame(root, bg=mainFrameColor)
