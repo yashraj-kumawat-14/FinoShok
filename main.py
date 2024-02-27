@@ -32,8 +32,11 @@ class finoshok:
         calculatorFrame = Frame(toolFrame, bg=toolFrameColor)
         calculatorFrame.pack(side="bottom")
 
-        Calculator(calculatorFrame)
-
+        calc = Calculator(calculatorFrame)
+        root.bind("<Key>", calc.keyBoardHandler)
+        for child in root.winfo_children():
+            child.bind("<Key>", calc.keyBoardHandler)
+        # root.bind("<key>", calc.)
         #CREATING main frame in root
 
         mainFrame = Frame(root, bg=mainFrameColor)
