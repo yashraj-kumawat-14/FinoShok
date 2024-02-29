@@ -4,36 +4,40 @@ from tkinter import ttk
 from login import Login
 from calculator import Calculator
 from notepad import Notepad
+from addCustomer import AddCustomer
 
-class finoshok:
+class Finoshok:
     def __init__(self, root):
         #colors used in gui
-        mainFrameColor = "grey"
-        statusBarColor = "red"
-        toolFrameColor = "green"
+        self.mainFrameColor = "grey"
+        self.statusBarColor = "red"
+        self.toolFrameColor = "green"
+        self.tabColor = "blue"
+
         #making a menubar
         mainMenubar = Menu(root)
         mainMenubar.add_command(label="hello")
+
         #making submenubarss
         submenu = Menu(mainMenubar, tearoff=0)
-        submenu.add_command(label="raj")
+        submenu.add_command(label="Add Customer", command=self.addCustomer)
         submenu.add_checkbutton(label="rajj")
 
         #adding submenu in mainmenybar
-        mainMenubar.add_cascade(menu=submenu, label="gile")
+        mainMenubar.add_cascade(menu=submenu, label="File")
 
         #configuring the menu in root as mainmenubar
         root.config(menu=mainMenubar)
 
         #creating toolFrame in root
 
-        toolFrame = Frame(root, bg=toolFrameColor)
+        toolFrame = Frame(root, bg=self.toolFrameColor)
         toolFrame.pack(side="left", fill="y")
 
-        noteFrame = Frame(toolFrame, bg=toolFrameColor, borderwidth=2, relief="groove")
+        noteFrame = Frame(toolFrame, bg=self.toolFrameColor, borderwidth=2, relief="groove")
         noteFrame.pack(side="top", fill="both", expand=True)
 
-        calculatorFrame = Frame(toolFrame, bg=toolFrameColor, borderwidth=2, relief="groove")
+        calculatorFrame = Frame(toolFrame, bg=self.toolFrameColor, borderwidth=2, relief="groove")
         calculatorFrame.pack(side="bottom")
         
 
@@ -48,47 +52,74 @@ class finoshok:
 
         #CREATING main frame in root
 
-        mainFrame = Frame(root, bg=mainFrameColor)
+        mainFrame = Frame(root, bg=self.mainFrameColor)
         mainFrame.pack(fill="both", expand=True)
 
         #creating a notebook of tabs in mainframe
 
-        my_notebook = ttk.Notebook(mainFrame)
-        my_notebook.pack(fill="both", expand=True)
+        self.myNotebook = ttk.Notebook(mainFrame)
+        self.myNotebook.pack(fill="both", expand=True)
+
+        #making a dictionary to hold tabs by their names so that we can manipulate and navigate to tabs without any confustion later
+        self.tabsDictionary = {}
+        self.addTab("dummyTab")
 
         #creating tabs in notebook
 
-        tab1 = Frame(my_notebook, bg=mainFrameColor)
-        tab2 = Frame(my_notebook, bg=toolFrameColor)
-        tab1.pack(fill="both", expand=True)
-        tab2.pack(fill="both", expand=True)
+        # tab1 = Frame(my_notebook, bg=self.mainFrameColor)
+        # tab2 = Frame(my_notebook, bg=self.toolFrameColor)
+        # tab1.pack(fill="both", expand=True)
+        # tab2.pack(fill="both", expand=True)
 
-        my_notebook.add(tab1, text="yashraj")
-        my_notebook.add(tab2, text="kumawat")
+        # my_notebook.add(tab1, text="yashraj")
+        # my_notebook.add(tab2, text="kumawat")
 
         #navigation buttons for tabs
-        def hide():
-            my_notebook.hide(1)
-        def show():
-            my_notebook.add(tab2, text="kumawat")
-        def select():
-            my_notebook.select(1)
+        # def hide():
+        #     my_notebook.hide(1)
+        # def show():
+        #     my_notebook.add(tab2, text="kumawat")
+        # def select():
+        #     my_notebook.select(1)
 
 
-        hideButton = Button(tab1, text="hide tab 2", command=hide)
-        hideButton.pack()
+        # hideButton = Button(tab1, text="hide tab 2", command=hide)
+        # hideButton.pack()
 
-        showButton = Button(tab1, text="show tab 2", command=show)
-        showButton.pack()
+        # showButton = Button(tab1, text="show tab 2", command=show)
+        # showButton.pack()
 
-        selectButton = Button(tab1, text="select tab 2", command=select)
-        selectButton.pack()
+        # selectButton = Button(tab1, text="select tab 2", command=select)
+        # selectButton.pack()
 
         #creating a status bar
-        statusBar = Frame(root, bg=statusBarColor)
+        statusBar = Frame(root, bg=self.statusBarColor)
         statusBar.pack(side="bottom", fill="x")
+    
+    #method or function to add tabs in myNotebook, it takes one parameter tabName which has store tab's name
+    def addTab(self, tabName):
+        #check if the tab is already present in tabsDictionary so that we do not create the same tab again
+        if(tabName not in self.tabsDictionary.keys()):
+            #tabframe to hold contents of the tab
+            tabFrame = Frame(self.myNotebook, bg=self.tabColor)
+            tabFrame.pack(fill="both", expand=True)
 
+            #appending tab in the dictionary with their tab names
+            self.tabsDictionary[tabName]=tabFrame
 
+            #now adding the frame as a tab in myNotebook
+            self.myNotebook.add(tabFrame, text=tabName)
+            return True
+        else:
+            #return false if tab already exists
+            return False
+    
+    def addCustomer(self):
+        if(self.addTab("Add Customer")):
+            AddCustomer(self.tabsDictionary["Add Customer"])
+        else:
+            index=list(self.tabsDictionary.keys()).index("Add Customer")
+            self.myNotebook.select(index)
 
 
 if __name__=="__main__":
@@ -108,6 +139,6 @@ if __name__=="__main__":
         root = Tk()
         root.geometry("400x400")
         root.title("finoshok")
-        finoshok(root)
+        Finoshok(root)
 
         root.mainloop()
