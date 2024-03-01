@@ -5,6 +5,7 @@ from login import Login
 from tools.calculator import Calculator
 from tools.notepad import Notepad
 from tabs.addCustomer import AddCustomer
+from tabs.addFile import AddFile
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
 
 class Finoshok:
@@ -16,7 +17,11 @@ class Finoshok:
         #making submenubarss
         submenu = Menu(mainMenubar, tearoff=0)
         submenu.add_command(label="Add Customer", command=self.addCustomer)
+        self.aCustomerCount = 0 #making it so that user can create multiple add customer tabs
+
         submenu.add_checkbutton(label="rajj")
+        submenu.add_command(label="Add new file", command=self.addFile)
+        self.aFileCount = 0 #making it so that user can create multiple add new file tabs
 
         #adding submenu in mainmenybar
         mainMenubar.add_cascade(menu=submenu, label="File")
@@ -80,12 +85,23 @@ class Finoshok:
             #return false if tab already exists
             return False
     
+    #this adds a customer tab in the notebook
     def addCustomer(self):
-        if(self.addTab("Add Customer")):
-            AddCustomer(self.tabsDictionary["Add Customer"])
-        else:
-            index=list(self.tabsDictionary.keys()).index("Add Customer")
-            self.myNotebook.select(index)
+        #it calls addtab function to add tab named Add Customer + count
+        self.addTab("Add Customer"+f" {self.aCustomerCount}")
+
+        #now we update the self.tabsDictionary to keep track of tabs
+        AddCustomer(self.tabsDictionary["Add Customer"+f" {self.aCustomerCount}"])
+        self.aCustomerCount+=1 #here now we increment corresponding count
+
+    #this adds a new file tab in notebook
+    def addFile(self):
+        #it calls addtab function to add tab named Add File + count
+        self.addTab("Add File"+f" {self.aFileCount}")
+
+        #now we update the self.tabsDictionary to keep track of tabs
+        AddFile(self.tabsDictionary["Add File"+f" {self.aFileCount}"])
+        self.aFileCount+=1 #here now we increment the corresponding count
 
 
 if __name__=="__main__":
