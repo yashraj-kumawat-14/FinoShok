@@ -6,6 +6,7 @@ from tools.calculator import Calculator
 from tools.notepad import Notepad
 from tabs.addCustomer import AddCustomer
 from tabs.addFile import AddFile
+from tabs.dashboard import Dashboard
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
 
 class Finoshok:
@@ -62,6 +63,11 @@ class Finoshok:
 
         #making a dictionary to hold tabs by their names so that we can manipulate and navigate to tabs without any confustion later
         self.tabsDictionary = {}
+
+        #creating uncloasable dashboard
+        self.addTab("Dashboard")
+        Dashboard(self.tabsDictionary["Dashboard"])
+
 
         #creating a status bar
         statusBar = Frame(root, bg=STATUSBARCOLOR)
