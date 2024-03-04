@@ -7,14 +7,19 @@ from tools.notepad import Notepad
 from tabs.addCustomer import AddCustomer
 from tabs.addFile import AddFile
 from tabs.dashboard import Dashboard
+from tabs.about import About
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
 
 class Finoshok:
     def __init__(self, root):
+
+        #about object made out from About class to show information related the software
+        self.about = About()
+
         #making a menubar
         mainMenubar = Menu(root)
         mainMenubar.add_command(label="hello")
-
+        
         #making submenubarss
         submenu = Menu(mainMenubar, tearoff=0)
         submenu.add_command(label="Add Customer", command=self.addCustomer)
@@ -26,6 +31,9 @@ class Finoshok:
 
         #adding submenu in mainmenybar
         mainMenubar.add_cascade(menu=submenu, label="File")
+
+        #adding a about command
+        mainMenubar.add_command(label="about", command=self.about.showMessage)
 
         #configuring the menu in root as mainmenubar
         root.config(menu=mainMenubar)
