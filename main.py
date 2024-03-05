@@ -8,17 +8,15 @@ from tabs.addCustomer import AddCustomer
 from tabs.addFile import AddFile
 from tabs.dashboard import Dashboard
 from tabs.about import About
+from tabs.helpMenu import HelpMenu
+
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
 
 class Finoshok:
     def __init__(self, root):
 
-        #about object made out from About class to show information related the software
-        self.about = About()
-
         #making a menubar
         mainMenubar = Menu(root)
-        mainMenubar.add_command(label="hello")
         
         #making submenubarss
         submenu = Menu(mainMenubar, tearoff=0)
@@ -32,8 +30,12 @@ class Finoshok:
         #adding submenu in mainmenybar
         mainMenubar.add_cascade(menu=submenu, label="File")
 
-        #adding a about command
-        mainMenubar.add_command(label="about", command=self.about.showMessage)
+        #about object made out from About class to show information related the software
+        About(mainMenubar)
+
+        #creating a help menu item in Mainmenubar
+
+        HelpMenu(mainMenubar)
 
         #configuring the menu in root as mainmenubar
         root.config(menu=mainMenubar)
@@ -94,6 +96,12 @@ class Finoshok:
 
             #now adding the frame as a tab in myNotebook
             self.myNotebook.add(tabFrame, text=tabName)
+
+            #selecting the tab after creating it
+            tabIndex = list(self.tabsDictionary.keys()).index(tabName)
+            self.myNotebook.select(tabIndex)
+            
+            #return true if tab created successfully.
             return True
         else:
             #return false if tab already exists
