@@ -23,12 +23,15 @@ class Finoshok:
         submenu.add_command(label="Add Customer", command=self.addCustomer)
         self.aCustomerCount = 0 #making it so that user can create multiple add customer tabs
 
-        submenu.add_checkbutton(label="rajj")
+        submenu.add_checkbutton(label="Dummy_check")
         submenu.add_command(label="Add new file", command=self.addFile)
         self.aFileCount = 0 #making it so that user can create multiple add new file tabs
 
         #adding submenu in mainmenybar
         mainMenubar.add_cascade(menu=submenu, label="File")
+        
+        #adding settings menu option
+        mainMenubar.add_command(label="Settings", command=lambda:self.addTab("Settings"))
 
         #about object made out from About class to show information related the software
         About(mainMenubar)
