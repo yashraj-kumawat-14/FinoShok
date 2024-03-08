@@ -21,15 +21,16 @@ class Finoshok:
         #making submenubarss
         submenu = Menu(mainMenubar, tearoff=0)
         submenu.add_command(label="Add Customer", command=self.addCustomer)
-        self.aCustomerCount = 0 #making it so that user can create multiple add customer tabs
 
         submenu.add_checkbutton(label="Dummy_check")
         submenu.add_command(label="Add new file", command=self.addFile)
-        self.aFileCount = 0 #making it so that user can create multiple add new file tabs
 
         #adding submenu in mainmenybar
         mainMenubar.add_cascade(menu=submenu, label="File")
         
+        #adding personal finance option in menu
+        mainMenubar.add_command(label="Personal Finance", command=self.personalFinance)
+
         #adding settings menu option
         mainMenubar.add_command(label="Settings", command=lambda:self.addTab("Settings"))
 
@@ -87,7 +88,7 @@ class Finoshok:
         statusBar.pack(side="bottom", fill="x")
 
     #method or function to add tabs in myNotebook, it takes one parameter tabName which has store tab's name
-    def addTab(self, tabName):
+    def addTab(self, tabName, multiple=False):
         #check if the tab is already present in tabsDictionary so that we do not create the same tab again
         if(tabName not in self.tabsDictionary.keys()):
             #tabframe to hold contents of the tab
@@ -99,34 +100,66 @@ class Finoshok:
 
             #now adding the frame as a tab in myNotebook
             self.myNotebook.add(tabFrame, text=tabName)
-
+            print(tabName)
             #selecting the tab after creating it
             tabIndex = list(self.tabsDictionary.keys()).index(tabName)
             self.myNotebook.select(tabIndex)
             
             #return true if tab created successfully.
-            return True
+            return tabName
+        
+        #if the caller has stated multiple = True then new tab with former name with an increment will be created
+        elif(multiple):
+            count=1 # base count
+            baseTabName = tabName #base tabname set to the tabname
+
+            #continously try to add tab until its created . after createing return tabName
+            while(True):
+                #dynamictab name changes with time
+                dynamicTabName = baseTabName+f" {count}" 
+
+                #it contains the return value of function 
+                returnValue = (self.addTab(dynamicTabName, multiple=False)) 
+
+                 #if returnvalue is tabname then return it to the caller
+                if(returnValue):
+                    return returnValue
+                else:
+                    #else continue the loop until the creation of tab
+
+                    #incrementing the count
+                    count+=1
+                    continue
+
         else:
-            #return false if tab already exists
+            #return false if tab already exists and selecting the preexisting tab
+            tabIndex = list(self.tabsDictionary.keys()).index(tabName)
+            self.myNotebook.select(tabIndex)
             return False
     
+    def tabExists(self):
+        pass
+     
     #this adds a customer tab in the notebook
     def addCustomer(self):
         #it calls addtab function to add tab named Add Customer + count
-        self.addTab("Add Customer"+f" {self.aCustomerCount}")
+        tabName = self.addTab("Add Customer", multiple=True)
 
-        #now we update the self.tabsDictionary to keep track of tabs
-        AddCustomer(self.tabsDictionary["Add Customer"+f" {self.aCustomerCount}"])
-        self.aCustomerCount+=1 #here now we increment corresponding count
+        # adding contents of AddCustomer class to the add customer tab
+        AddCustomer(self.tabsDictionary[tabName])
 
     #this adds a new file tab in notebook
     def addFile(self):
-        #it calls addtab function to add tab named Add File + count
-        self.addTab("Add File"+f" {self.aFileCount}")
+        #it calls addtab function to add tab named Add FIle + count
+        tabName = self.addTab("Add File", multiple=True)
 
-        #now we update the self.tabsDictionary to keep track of tabs
-        AddFile(self.tabsDictionary["Add File"+f" {self.aFileCount}"])
-        self.aFileCount+=1 #here now we increment the corresponding count
+        # adding contents of AddCustomer class to the add customer tab
+        AddFile(self.tabsDictionary[tabName])
+    
+    #function personalFinance will handle actions related to the user's own finance
+    def personalFinance(self):
+        self.addTab("Personal Finance")
+        pass
 
 
 if __name__=="__main__":
