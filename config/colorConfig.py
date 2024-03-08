@@ -3,7 +3,7 @@
 #color used in main.py
 MAINFRAMECOLOR = "#5D3A00"
 TOOLFRAMECOLOR = "#9B8816"
-TABCOLOR = "#684E32"
+TABCOLOR = "black" #"#684E32"
 STATUSBARCOLOR = "black"
 
 #colors used in login.py

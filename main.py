@@ -79,7 +79,7 @@ class Finoshok:
         self.tabsDictionary = {}
 
         #creating uncloasable dashboard
-        self.addTab("Dashboard")
+        self.addTab("Dashboard", closeBtn=False)
         Dashboard(self.tabsDictionary["Dashboard"])
 
 
@@ -88,19 +88,24 @@ class Finoshok:
         statusBar.pack(side="bottom", fill="x")
 
     #method or function to add tabs in myNotebook, it takes one parameter tabName which has store tab's name
-    def addTab(self, tabName, multiple=False):
+    def addTab(self, tabName, multiple=False, closeBtn=True):
         #check if the tab is already present in tabsDictionary so that we do not create the same tab again
         if(tabName not in self.tabsDictionary.keys()):
             #tabframe to hold contents of the tab
             tabFrame = Frame(self.myNotebook, bg=TABCOLOR)
             tabFrame.pack(fill="both", expand=True)
 
+            #creating close button to close tabs. if it is not false only then
+            if(closeBtn):
+                closeButton = Button(tabFrame, text="X", bg="red", command=lambda:self.closeTab(tabName))
+                closeButton.pack(anchor=NE, ipadx=15)
+
             #appending tab in the dictionary with their tab names
             self.tabsDictionary[tabName]=tabFrame
 
             #now adding the frame as a tab in myNotebook
             self.myNotebook.add(tabFrame, text=tabName)
-            print(tabName)
+            
             #selecting the tab after creating it
             tabIndex = list(self.tabsDictionary.keys()).index(tabName)
             self.myNotebook.select(tabIndex)
@@ -137,8 +142,12 @@ class Finoshok:
             self.myNotebook.select(tabIndex)
             return False
     
-    def tabExists(self):
-        pass
+    
+    #this function close the tab with associated with tabName and updates the dictionary by deleting the corresoponding key -velue pair
+    def closeTab(self, tabName):
+        tabIndex = list(self.tabsDictionary.keys()).index(tabName)
+        self.myNotebook.forget(tabIndex)
+        self.tabsDictionary.pop(tabName)
      
     #this adds a customer tab in the notebook
     def addCustomer(self):
