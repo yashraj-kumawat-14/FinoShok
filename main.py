@@ -94,7 +94,7 @@ class Finoshok:
 
             #creating close button to close tabs. if it is not false only then
             if(closeBtn):
-                closeButton = Button(tabFrame, text="X", bg="red", command=lambda:self.closeTab(tabName))
+                closeButton = Button(tabFrame, text="X", bg="red", fg="white", command=lambda:self.closeTab(tabName))
                 closeButton.pack(anchor=NE, ipadx=15)
 
             #appending tab in the dictionary with their tab names
