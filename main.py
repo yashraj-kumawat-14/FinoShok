@@ -56,12 +56,9 @@ class Finoshok:
         calculatorFrame.pack(side="bottom")
         
 
-        #binding widgets to keyBoardHandler for key event
+        #binding widgets to keyBoardHandler for key event anc creating a calculator
         calc = Calculator(calculatorFrame)
-        root.bind("<Key>", calc.keyBoardHandler)
-        for child in root.winfo_children():
-            child.bind("<Key>", calc.keyBoardHandler)
-
+        
         #create mini notepad
         notepad = Notepad(noteFrame, 200, 200)
 
@@ -173,17 +170,18 @@ class Finoshok:
 
 if __name__=="__main__":
     #login window 
-    login_window = Tk()
-    login_window.title("Login")
-    login_window.geometry("200x200")
-    login_window.resizable(False, False)
+    # login_window = Tk()
+    # login_window.title("Login")
+    # login_window.geometry("200x200")
+    # login_window.resizable(False, False)
     
-    #passing login_window to login class to make working login window
-    Login(login_window)
-    login_window.mainloop()
+    # #passing login_window to login class to make working login window
+    # Login(login_window)
+    # login_window.mainloop()
 
     # checking if the credentials are correct
-    if(login_window.result):
+    # login_window.result
+    if(True):
         #initiating the gui
         root = Tk()
         root.geometry("400x400")
