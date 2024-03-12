@@ -118,6 +118,7 @@ class Calculator:
             self.ans()
         else:
             pass
+
     #this function displays the entry of previous result and the operations or numbers sum as a string on the display
     def operationAndNum(self, operationName):
         self.tempCalcWindow.focus_set()

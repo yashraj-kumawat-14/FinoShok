@@ -3,4 +3,4 @@
 HOSTNAME = "localhost"
 PASSWORD = "1234"
 USER = "root"
-DATABASE = "finoshok1"
+DATABASE = "finoshok11"
