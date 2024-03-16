@@ -1,9 +1,13 @@
 #importing only necessary classes and things from library
 from tkinter import Tk, Frame, Label, Entry, Button, Checkbutton, IntVar
+from tkinter.filedialog import askopenfilename
+from PIL import Image, ImageTk
 
 #AddCustomer class needs a parameter either a tk window or frame
 class AddCustomer:
     def __init__(self, addCustomerWindow):
+        #initial state of customerphoto is set to None
+        self.customerPhoto = None
         mainFrameColor="black"
         subFrameColor = "black"
 
@@ -74,17 +78,17 @@ class AddCustomer:
         def dynamicWidth(event, entryList):
             #intitially condition is set to True 
             condition=True
-
+            
+            #empty which will hold the length of character present in a entry with more than 10 characters
+            lengthEntryList = list()
             #traversing through all entries
             for entry in entryList:
-                #checking if any one entry has no. of character more than 13
-                if(len(entry.get())>13):
-                    #if more than 13 then all entries width will be configured or set to their length +1
-                    for otherEntry in entryList:
-                        otherEntry.config(width=len(entry.get())+1)
-                    #now condition is set to false
-                    condition = False
+                #checking if any one entry has no. of character more than 10
+                if(len(entry.get())>10):
+                    lengthEntryList.append(len(entry.get()))
+                    condition=False
 
+           
             #if condition is true till now that means none of the entry in entryList has length of characters more than 13 so we set the width of all entries to 14
             
             if(condition):
@@ -92,6 +96,11 @@ class AddCustomer:
                 for otherEntry in entryList:
                         #configuring widht of entries
                         otherEntry.config(width=14)
+            #ELSE widht of all entries will be configured to maxlength on any one entry
+            else:
+                maxLength = max(lengthEntryList)
+                for entry in entryList:
+                    entry.config(width=maxLength+10)
 
         #creating entryList variable containing all entry widgets whom we wnat to enable dynamic width
         entryList = [cNameEntry, aadharEntry, mobileEntry, fNameEntry, hAddressEntry, wAddressEntry]
@@ -102,10 +111,31 @@ class AddCustomer:
             #lambda is used to make anonymous function syntax : lambda arguments : expression
             entry.bind("<Key>", func= lambda event, entryList=entryList: dynamicWidth(event, entryList))
 
-        def photoUpload():
-            pass
+        #this function helps to selec images and display on the screen
+        def photoSelect():
+            #this photopath variable stores the path of image of customer
+            photoPath = askopenfilename(title="Select Customer's Photo", initialdir="/",filetypes=(("PNG", "*.png"),("JPG", "jpg")), multiple=False)
+            
+            #if photopath is not empty then only it will proceed
+            if(photoPath):
+                #creating a PIL image object
+                img=Image.open(photoPath)
+                #resizing the image
+                img=img.resize((82,80))
+
+                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+                self.customerPhoto = ImageTk.PhotoImage(img)
+
+                #now integrating the image into label widget and positioning it via grid 
+                customerPhotoLabel = Label(subFrame, image=self.customerPhoto)
+                customerPhotoLabel.grid(row=6, column=1, pady=4)
+
+                #changing the text of photoUploadButton from 'select' to 'Change' and also changing its position in the grid
+                photoUploadButton.config(text="Change")
+                photoUploadButton.grid(row=7, column=1)
+            
         #this button will be used to upload photos
-        photoUploadButton = Button(subFrame, text="Upload", font="COPPER 8", width=13, command=photoUpload)
+        photoUploadButton = Button(subFrame, text="Select", font="COPPER 8", width=13, command=photoSelect)
         photoUploadButton.grid(row=6, column=1)
 
         #this checkAndSaveButton
