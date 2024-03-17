@@ -126,3 +126,35 @@ class Model:
 
             #returning true means succeessful insertion and false for unsuccessfull  insertion
             return (object.dataModify(f"update `{self.tableName}` SET {formattedString} where `id` = {id}"))
+    
+    #fetching data based on prevalues of columns
+    def whereData(self, **kwargs):
+        data = kwargs
+        #creating a empty list
+        columns=list()
+
+        #again creating tempKeys to get latest keys present in the data after filtration
+        tempKeys = list(data.keys())
+
+        #iterating through tempkeys to manipulate string and do some necessary concatenation before executing or inserting the data
+        for key in tempKeys:
+            columns.append("`"+key+"`")
+
+        values=list()
+        tempValues = list(data.values())
+
+        for value in tempValues:
+            values.append("'"+value+"'")
+
+        #FORMATED STRING
+        formattedString = ""
+        for i in range(len(data)):
+            formattedString+= columns[i]+"="+values[i]
+            
+        #creating a database object
+        object = Database()
+
+        #returning true means succeessful fething and false for unsuccessfull  fetching
+        return (object.fetchData(f"select * from `{self.tableName}` where {formattedString}"))
+  
+

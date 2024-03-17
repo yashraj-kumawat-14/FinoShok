@@ -1,19 +1,31 @@
 #importing only necessary classes and things from library
-from tkinter import Tk, Frame, Label, Entry, Button, Checkbutton, IntVar
+import sys
+sys.path.append(r"D:\projects\finoshok\finoshok\model")
+sys.path.append(r"D:\projects\finoshok\finoshok\config")
+from pathConfig import CUSTOMERPHOTOPATH
+from Customer import Customer
+from tkinter import Tk, Frame, Label, Entry, Button, Checkbutton, IntVar, END
 from tkinter.filedialog import askopenfilename
 from PIL import Image, ImageTk
+import shutil
 
 #AddCustomer class needs a parameter either a tk window or frame
 class AddCustomer:
     def __init__(self, addCustomerWindow):
-        #initial state of customerphoto is set to None
+        #initial state of customerphoto  and self.photopath is set to None
         self.customerPhoto = None
+        self.photoPath = None
+
         mainFrameColor="black"
         subFrameColor = "black"
 
         #heading label of the tab
         addCustomerLabel = Label(addCustomerWindow, text="Add Customer", font="COPPER 15", fg="yellow", bg="black")
         addCustomerLabel.pack(side="top", fill="x", ipady=20)
+
+        #alreadyExistsLabel initially set to empty
+        instructionLabel = Label(addCustomerWindow, text="", font="COPPER 13", fg="red", bg="black")
+        instructionLabel.pack(side="top", fill="x",ipady=10)
 
         #created mainFrame which will hold everything of AddCustomer page
         mainFrame = Frame(addCustomerWindow, bg=mainFrameColor)
@@ -113,13 +125,13 @@ class AddCustomer:
 
         #this function helps to selec images and display on the screen
         def photoSelect():
-            #this photopath variable stores the path of image of customer
-            photoPath = askopenfilename(title="Select Customer's Photo", initialdir="/",filetypes=(("PNG", "*.png"),("JPG", "jpg")), multiple=False)
+            #this self.photopath variable stores the path of image of customer
+            self.photoPath = askopenfilename(title="Select Customer's Photo", initialdir="/",filetypes=(("PNG", "*.png"),("JPG", "jpg")), multiple=False)
             
             #if photopath is not empty then only it will proceed
-            if(photoPath):
+            if(self.photoPath):
                 #creating a PIL image object
-                img=Image.open(photoPath)
+                img=Image.open(self.photoPath)
                 #resizing the image
                 img=img.resize((82,80))
 
@@ -127,19 +139,86 @@ class AddCustomer:
                 self.customerPhoto = ImageTk.PhotoImage(img)
 
                 #now integrating the image into label widget and positioning it via grid 
-                customerPhotoLabel = Label(subFrame, image=self.customerPhoto)
-                customerPhotoLabel.grid(row=6, column=1, pady=4)
+                self.customerPhotoLabel = Label(subFrame, image=self.customerPhoto)
+                self.customerPhotoLabel.grid(row=6, column=1, pady=4)
 
                 #changing the text of photoUploadButton from 'select' to 'Change' and also changing its position in the grid
-                photoUploadButton.config(text="Change")
-                photoUploadButton.grid(row=7, column=1)
+                photoSelectButton.config(text="Change")
+                photoSelectButton.grid(row=7, column=1)
             
         #this button will be used to upload photos
-        photoUploadButton = Button(subFrame, text="Select", font="COPPER 8", width=13, command=photoSelect)
-        photoUploadButton.grid(row=6, column=1)
+        photoSelectButton = Button(subFrame, text="Select", font="COPPER 8", width=13, command=photoSelect)
+        photoSelectButton.grid(row=6, column=1)
+
+        #checkAndSave function for checking if all fields are filled properly and the customers already exists or not. if not exists then save it to database along with the necessary details
+        def checkAndSave():
+            #checking if the fields are filled properly
+            if((not cNameEntry.get())):
+                requirementsFilled=False
+                instructionText = "Please fill Customer's Name Field"
+            elif(((not aadharEntry.get().isdigit()) or (len(aadharEntry.get())!=12))):
+                requirementsFilled=False
+                instructionText = "Please Fill Right Format of Aadhar"
+            elif((not mobileEntry.get().isdigit()) or (len(mobileEntry.get())!=10)):
+                requirementsFilled=False
+                instructionText = "Please Fill Right Format of Mobile"
+            elif((not fNameEntry.get())):
+                requirementsFilled=False
+                instructionText = "Please fill Father's Name Field"
+            elif((not hAddressEntry.get())):
+                requirementsFilled=False
+                instructionText = "Please fill Home Address Field"
+            elif((not wAddressEntry.get())):
+                requirementsFilled=False
+                instructionText = "Please fill work address Field"
+            else:
+                requirementsFilled=True
+                 
+            if(requirementsFilled):
+                #check if customer already exists on the basis of its aadhar
+                customerObject = Customer()
+                data = customerObject.whereData(aadhar = aadharEntry.get())
+                if(not data):
+                    alreadyExists = False
+                else:
+                    alreadyExists = True
+                
+                if(not alreadyExists):
+                    #code for saving the customer
+                    
+                    
+                    #insertSuccessfully true if successfull insertion else false
+                    insertSuccessfully= (customerObject.insertData(name=cNameEntry.get(), father=fNameEntry.get(), mobile=mobileEntry.get(), aadhar =aadharEntry.get(), home_address=hAddressEntry.get(), work_address=wAddressEntry.get()))
+
+                    #if customer data inserted succesfully then only proceed
+                    if(insertSuccessfully):
+                        #adding customer's photo to assets if photoPath exists
+                        shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{aadharEntry.get()}.jpg")
+
+                        #instructing user that all things are carried out successfully
+                        instructionText="Customer added to database successfully"
+                        instructionLabel.config(text=instructionText, fg="green")
+                        #removing old data from all entries
+                        for entry in entryList:
+                            entry.delete(0, END)
+                        self.customerPhoto=None
+                        self.customerPhotoLabel.destroy()
+                        photoSelectButton.grid(row=6,column=1)
+
+                    else:
+                        #instructing to user that customer can't be addede successully if insertSuccessfully is false
+                        instructionText="Customer Cannot Be Added To Database"
+                        instructionLabel.config(text=instructionText, fg="red")
+        
+                else:
+                    #code for showing error in the tab that custoemr with this aadhar  already exists
+                    instructionText = "Customer with same aadhar already exists !"
+                    instructionLabel.config(text=instructionText, fg="red")
+            else:
+                instructionLabel.config(text=instructionText, fg="red")
 
         #this checkAndSaveButton
-        checkAndSaveButton = Button(mainFrame, text="Check And Save")
+        checkAndSaveButton = Button(mainFrame, text="Check And Save", command=checkAndSave)
         checkAndSaveButton.grid(row=1, column=0)
 
 if __name__=="__main__":

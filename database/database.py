@@ -34,7 +34,7 @@ class Database:
     
     def dataModify(self, query):
         #making connection with database
-        conn = mysql.connector.connect(host='localhost', user="root", password="1234", database="finoshok11")
+        conn = mysql.connector.connect(host=HOSTNAME, user=USER, password=PASSWORD, database=DATABASE)
 
         #creating cursor to perform queries and get results
         cursor = conn.cursor()
