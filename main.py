@@ -9,6 +9,7 @@ from tabs.addFile import AddFile
 from tabs.dashboard import Dashboard
 from tabs.about import About
 from tabs.helpMenu import HelpMenu
+from tabs.addLoanRequest import AddLoanRequest
 
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
 
@@ -24,6 +25,7 @@ class Finoshok:
 
         submenu.add_checkbutton(label="Dummy_check")
         submenu.add_command(label="Add new file", command=self.addFile)
+        submenu.add_command(label="Add Credit Request", command=self.addLoanRequest)
 
         #adding submenu in mainmenybar
         mainMenubar.add_cascade(menu=submenu, label="File")
@@ -162,6 +164,13 @@ class Finoshok:
         # adding contents of AddCustomer class to the add customer tab
         AddFile(self.tabsDictionary[tabName])
     
+    #this function adds a tab of addLoanRequest
+    def addLoanRequest(self):
+        #it calls addtab function to add tab named Add Loan Request + count
+        tabName = self.addTab("Add Loan Request", multiple=True)
+         # adding contents of AddLoanRequest class to the add loan request tab
+        AddLoanRequest(self.tabsDictionary[tabName])
+
     #function personalFinance will handle actions related to the user's own finance
     def personalFinance(self):
         self.addTab("Personal Finance")

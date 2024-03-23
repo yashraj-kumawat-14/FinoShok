@@ -22,16 +22,16 @@ class Dashboard:
         #created subframes for showing different graphs and data
         
         #The sticky parameter in the .grid() method of Tkinter is used to define how a widget should expand to fill the space allocated to it within a grid cell.
-        subFrame1 = Frame(mainFrame, bg=subFrame1Color,width=200, height=200)
+        subFrame1 = Frame(mainFrame, bg=subFrame1Color)
         subFrame1.grid(row=0, column=0, sticky="ewns")
 
-        subFrame2 = Frame(mainFrame, bg=subFrame2Color,width=200, height=200)
+        subFrame2 = Frame(mainFrame, bg=subFrame2Color)
         subFrame2.grid(row=0, column=1, sticky="ewns")
         
-        subFrame3 = Frame(mainFrame, bg=subFrame3Color,width=200, height=200)
+        subFrame3 = Frame(mainFrame, bg=subFrame3Color)
         subFrame3.grid(row=1, column=0, sticky="ewns")
 
-        subFrame4 = Frame(mainFrame, bg=subFrame4Color,width=200, height=200)
+        subFrame4 = Frame(mainFrame, bg=subFrame4Color)
         subFrame4.grid(row=1, column=1, sticky="ewns")
 
 

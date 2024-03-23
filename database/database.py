@@ -17,7 +17,7 @@ class Database:
         cursor = conn.cursor()
 
         try:
-             #executing query
+            #executing query
             cursor.execute(query)
             #fetching data
             data = cursor.fetchall()

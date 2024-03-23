@@ -139,8 +139,8 @@ class AddCustomer:
                 self.customerPhoto = ImageTk.PhotoImage(img)
 
                 #now integrating the image into label widget and positioning it via grid 
-                self.customerPhotoLabel = Label(subFrame, image=self.customerPhoto)
-                self.customerPhotoLabel.grid(row=6, column=1, pady=4)
+                customerPhotoLabel = Label(subFrame, image=self.customerPhoto)
+                customerPhotoLabel.grid(row=6, column=1, pady=4)
 
                 #changing the text of photoUploadButton from 'select' to 'Change' and also changing its position in the grid
                 photoSelectButton.config(text="Change")
