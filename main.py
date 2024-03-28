@@ -15,7 +15,6 @@ from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRA
 
 class Finoshok:
     def __init__(self, root):
-
         #making a menubar
         mainMenubar = Menu(root)
         
@@ -76,6 +75,9 @@ class Finoshok:
 
         #making a dictionary to hold tabs by their names so that we can manipulate and navigate to tabs without any confustion later
         self.tabsDictionary = {}
+
+        #creating a addFileObjects variable because to hold addFile class objects
+        self.addFileObjects = []
 
         #creating uncloasable dashboard
         self.addTab("Dashboard", closeBtn=False)
@@ -161,8 +163,8 @@ class Finoshok:
         #it calls addtab function to add tab named Add FIle + count
         tabName = self.addTab("Add File", multiple=True)
 
-        # adding contents of AddCustomer class to the add customer tab
-        AddFile(self.tabsDictionary[tabName])
+        # adding contents of AddCustomer class to the add customer tab and apending the AddFile class object
+        self.addFileObjects.append (AddFile(self.tabsDictionary[tabName]))
     
     #this function adds a tab of addLoanRequest
     def addLoanRequest(self):

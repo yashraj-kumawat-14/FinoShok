@@ -43,15 +43,15 @@ class AddLoanRequest:
 
         #combobox is a ttk themed widget which is combination of list box and entry widget used to make a dropdown
         clientVar = StringVar()
-        clientCombobox = ttk.Combobox(subFrame, textvariable=clientVar, values=["yashraj", "kundan", "raj", "bhavesh"], state="readonly")
+        clientCombobox = ttk.Combobox(subFrame, textvariable=clientVar, values=["yashraj", "kundan", "raj", "bhavesh"], state="readonly", justify="center")
         clientCombobox.grid(row=0, column=1)
 
         loanVar = IntVar()
         loanVar.set(96000)
-        loanAmtEntry = Entry(subFrame, width=23, textvariable=loanVar, justify="right")
+        loanAmtEntry = Entry(subFrame, width=23, textvariable=loanVar, justify="center")
         loanAmtEntry.grid(row=1, column=1)
 
-        dateOfRequestEntry = DateEntry(subFrame, width=20, date_pattern="d/m/y")
+        dateOfRequestEntry = DateEntry(subFrame, width=20, date_pattern="d/m/y", justify="center")
         dateOfRequestEntry.grid(row=2, column=1)
 
         saveButton = ttk.Button(mainFrame, text="Save")

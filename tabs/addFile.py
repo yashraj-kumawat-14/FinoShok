@@ -1,4 +1,5 @@
-from tkinter import Tk, Frame, Label, Listbox, Scrollbar, END
+from tkinter import Tk, Frame, Label, Listbox, Scrollbar, END, Checkbutton, IntVar, StringVar, Entry
+from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 
 #AddFile class needs a parameter either a tk window or frame
@@ -40,7 +41,7 @@ class AddFile:
 
         #section 2 for loan confirmation along with some formalities
         section2 = Frame(subFrame2)
-        section2.pack(fill="both", expand=True)
+        section2.grid(row=0, column=0)
 
         #section 3 for showing selected loan request details along with some customer details
 
@@ -50,10 +51,11 @@ class AddFile:
         #now filling in these sections
         #section 1 work start-------
 
-        #creating a section3 as more responsive  using rowconfigure and columnconfigure
+        #creating a section1 as more responsive  using rowconfigure and columnconfigure
 
         section1.rowconfigure(0, weight=1)
         section1.columnconfigure(0, weight=1)
+
         customerRequestBox = Listbox(section1)
         customerRequestBox.grid(row=0, column=0, sticky="nsew")
 
@@ -63,15 +65,94 @@ class AddFile:
         scrollY.pack(side="right", fill="y")
         customerRequestBox.config(yscrollcommand=scrollY.set)
 
+        #creating scrollbar for x dirextion
+        scrollX = Scrollbar(customerRequestBox, command=customerRequestBox.xview, orient="horizontal")
+        scrollX.pack(side="bottom", fill="x")
+        customerRequestBox.config(xscrollcommand=scrollX.set)
+
 
         # scroll = Scrollbar(section1)
         # scroll.pack()
         for i in range(100):
-            customerRequestBox.insert(END, f"customer Id : {i} | name {i} | date : 2/2/2 | amount : 34000 |")
+            customerRequestBox.insert(END, f"customer Id : {i} | name {"Yash"} | amount : 34000 | date : 2/2/2 | mobile : 9999999999 | aadhar : 123456789012")
 
         #section 1 work ends----
         
         #section 2 work starts ----
+            
+        #creating a section1 as more responsive  using rowconfigure and columnconfigure
+
+        subFrame2.rowconfigure(0, weight=1)
+        subFrame2.columnconfigure(0, weight=1)
+
+        #now creating labels
+
+        approveLoanLabel = Label(section2, text="Approve Loan : ")
+        approveLoanLabel.grid(row=0, column=0)
+
+        dateApprovedLabel = Label(section2, text="Date Approved : ")
+        dateApprovedLabel.grid(row=1, column=0)
+
+        amountApprovedLabel = Label(section2, text="Amount Approved : ")
+        amountApprovedLabel.grid(row=2, column=0)
+
+        interestLabel = Label(section2, text="Interest : ")
+        interestLabel.grid(row=3, column=0)
+
+        loanPeriodLabel = Label(section2, text="Loan Period : ")
+        loanPeriodLabel.grid(row=4, column=0)
+
+        emiAmountLabel = Label(section2, text="EMI amount : ")
+        emiAmountLabel.grid(row=5, column=0)
+
+        totalEmiLabel = Label(section2, text="Total EMI's : ")
+        totalEmiLabel.grid(row=6, column=0)
+
+        #now creating entries, dateentry, combobox
+
+        #this function enables disabels the entries state on the basis of current value of loanCheckVar
+        def enableEntries():
+            if(loanCheckVar.get()):
+                for entry in entryList:
+                    entry.config(state="normal")
+            else:
+                for entry in entryList:
+                    entry.config(state="disable")
+
+
+        #here a check button is created to enable access to remaining entries and to make sure that loan is approved
+
+        loanCheckVar = IntVar()
+        approveLoanCheck = Checkbutton(section2, variable=loanCheckVar, command=enableEntries)
+        approveLoanCheck.grid(row=0, column=1, stick="w")
+
+        #created dateApprovedEntry to select the date on which loan was aprroved
+        dateApprovedEntry = DateEntry(section2, width=17, date_pattern="d/m/y", justify="center", state="disable")
+        dateApprovedEntry.grid(row=1, column=1)
+
+        #this entry holds the amount of loan which was approved
+        amountApprovedEntry = Entry(section2, state="disable")
+        amountApprovedEntry.grid(row=2, column=1)
+
+        #this entry holds the value of interes taken for particular client
+        interestEntry = Entry(section2, state="disable")
+        interestEntry.grid(row=3, column=1)
+
+        #this entry holds the time period in months or loan period
+        loanPeriodEntry = Entry(section2, state="disable")
+        loanPeriodEntry.grid(row=4, column=1)
+        
+        #this entry holds the amount of one emi
+        emiAmountEntry = Entry(section2, state="disable")
+        emiAmountEntry.grid(row=5, column=1)
+
+        #this entry holds the total number of emi's
+        totalEmiEntry = Entry(section2, state="disable")
+        totalEmiEntry.grid(row=6, column=1)
+
+        #entryList which holds all entries
+        entryList = [dateApprovedEntry, loanPeriodEntry, emiAmountEntry, totalEmiEntry, interestEntry, amountApprovedEntry]
+
         #section 2 work endss ----
             
         #section3 work starts ----
@@ -128,7 +209,7 @@ class AddFile:
         workAddressLabel.grid(row=3, column=0)
 
         #creating labels dynamic
-        customerEntryLabel = Label(detailsInnerFrame, text="Yashraj ")
+        customerEntryLabel = Label(detailsInnerFrame, text="Yashraj")
         customerEntryLabel.grid(row=0, column=1)
 
         civilScoreEntryLabel = Label(detailsInnerFrame, text="9 ")
