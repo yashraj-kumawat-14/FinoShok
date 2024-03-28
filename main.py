@@ -4,6 +4,7 @@ from tkinter import ttk
 from login import Login
 from tools.calculator import Calculator
 from tools.notepad import Notepad
+from tools.statusBar import StatusBar
 from tabs.addCustomer import AddCustomer
 from tabs.addFile import AddFile
 from tabs.dashboard import Dashboard
@@ -45,6 +46,10 @@ class Finoshok:
         #configuring the menu in root as mainmenubar
         root.config(menu=mainMenubar)
 
+        
+        #creating a status bar
+        statusBar = StatusBar(root)
+
         #creating toolFrame in root
 
         toolFrame = Frame(root, bg=TOOLFRAMECOLOR)
@@ -82,11 +87,6 @@ class Finoshok:
         #creating uncloasable dashboard
         self.addTab("Dashboard", closeBtn=False)
         Dashboard(self.tabsDictionary["Dashboard"])
-
-
-        #creating a status bar
-        statusBar = Frame(root, bg=STATUSBARCOLOR)
-        statusBar.pack(side="bottom", fill="x")
 
     #method or function to add tabs in myNotebook, it takes one parameter tabName which has store tab's name
     def addTab(self, tabName, multiple=False, closeBtn=True):
