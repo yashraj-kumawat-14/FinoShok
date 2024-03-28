@@ -195,7 +195,7 @@ if __name__=="__main__":
     if(True):
         #initiating the gui
         root = Tk()
-        root.geometry("400x400")
+        root.geometry("1000x630")
         root.title("finoshok")
         Finoshok(root)
 

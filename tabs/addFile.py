@@ -1,4 +1,4 @@
-from tkinter import Tk, Frame, Label, Listbox, Scrollbar, END, Checkbutton, IntVar, StringVar, Entry
+from tkinter import Tk, Frame, Label, Listbox, Scrollbar, END, Checkbutton, IntVar, StringVar, Entry, Button
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 
@@ -25,7 +25,7 @@ class AddFile:
         subFrame1 = Frame(mainFrame, bg=subFrame1Color, relief="groove", border=3)
         subFrame1.grid(row=0, column=0, sticky="ewns")
 
-        subFrame2 = Frame(mainFrame, bg=subFrame2Color, relief="groove", border=3)
+        subFrame2 = Frame(mainFrame, relief="groove", border=3)
         subFrame2.grid(row=0, column=1, sticky="ewns", rowspan=2)
 
         subFrame3 = Frame(mainFrame, bg=subFrame3Color, relief="groove", border=3)
@@ -41,7 +41,7 @@ class AddFile:
 
         #section 2 for loan confirmation along with some formalities
         section2 = Frame(subFrame2)
-        section2.grid(row=0, column=0)
+        section2.grid(row=0, column=0, sticky="n", pady=50)
 
         #section 3 for showing selected loan request details along with some customer details
 
@@ -88,25 +88,37 @@ class AddFile:
         #now creating labels
 
         approveLoanLabel = Label(section2, text="Approve Loan : ")
-        approveLoanLabel.grid(row=0, column=0)
+        approveLoanLabel.grid(row=0, column=0, pady=20)
 
         dateApprovedLabel = Label(section2, text="Date Approved : ")
-        dateApprovedLabel.grid(row=1, column=0)
+        dateApprovedLabel.grid(row=1, column=0, pady=20)
 
         amountApprovedLabel = Label(section2, text="Amount Approved : ")
-        amountApprovedLabel.grid(row=2, column=0)
+        amountApprovedLabel.grid(row=2, column=0, pady=20)
+
+        currencyLabel1= Label(section2, text=" ₹")
+        currencyLabel1.grid(row=2, column=2)
 
         interestLabel = Label(section2, text="Interest : ")
-        interestLabel.grid(row=3, column=0)
+        interestLabel.grid(row=3, column=0, pady=20)
+
+        percentLabel= Label(section2, text=" %")
+        percentLabel.grid(row=3, column=2)
 
         loanPeriodLabel = Label(section2, text="Loan Period : ")
-        loanPeriodLabel.grid(row=4, column=0)
+        loanPeriodLabel.grid(row=4, column=0, pady=20)
+
+        timeUnitLabel= Label(section2, text=" Months")
+        timeUnitLabel.grid(row=4, column=2)
 
         emiAmountLabel = Label(section2, text="EMI amount : ")
-        emiAmountLabel.grid(row=5, column=0)
+        emiAmountLabel.grid(row=5, column=0, pady=20)
+
+        currencyLabel2= Label(section2, text=" ₹")
+        currencyLabel2.grid(row=5, column=2)
 
         totalEmiLabel = Label(section2, text="Total EMI's : ")
-        totalEmiLabel.grid(row=6, column=0)
+        totalEmiLabel.grid(row=6, column=0, pady=20)
 
         #now creating entries, dateentry, combobox
 
@@ -115,9 +127,11 @@ class AddFile:
             if(loanCheckVar.get()):
                 for entry in entryList:
                     entry.config(state="normal")
+                    dateApprovedEntry.config(state="readonly")
             else:
                 for entry in entryList:
                     entry.config(state="disable")
+                    dateApprovedEntry.config(state="disable")
 
 
         #here a check button is created to enable access to remaining entries and to make sure that loan is approved
@@ -127,7 +141,7 @@ class AddFile:
         approveLoanCheck.grid(row=0, column=1, stick="w")
 
         #created dateApprovedEntry to select the date on which loan was aprroved
-        dateApprovedEntry = DateEntry(section2, width=17, date_pattern="d/m/y", justify="center", state="disable")
+        dateApprovedEntry = DateEntry(section2, width=17, date_pattern="dd/MM/yyyy", justify="center", state="disable", selectmode="day")
         dateApprovedEntry.grid(row=1, column=1)
 
         #this entry holds the amount of loan which was approved
@@ -151,7 +165,11 @@ class AddFile:
         totalEmiEntry.grid(row=6, column=1)
 
         #entryList which holds all entries
-        entryList = [dateApprovedEntry, loanPeriodEntry, emiAmountEntry, totalEmiEntry, interestEntry, amountApprovedEntry]
+        entryList = [loanPeriodEntry, emiAmountEntry, totalEmiEntry, interestEntry, amountApprovedEntry]
+
+        #creating save button
+        saveDataButton = Button(section2, text="Save", bg="orange")
+        saveDataButton.grid(row=7, columnspan=3, sticky="nsew")
 
         #section 2 work endss ----
             
