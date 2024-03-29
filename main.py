@@ -21,6 +21,7 @@ class Finoshok:
         
         #making submenubarss
         submenu = Menu(mainMenubar, tearoff=0)
+        submenu.add_command(label="Customers")
         submenu.add_command(label="Add Customer", command=self.addCustomer)
 
         submenu.add_checkbutton(label="Dummy_check")
