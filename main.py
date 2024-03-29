@@ -9,6 +9,7 @@ from tabs.addCustomer import AddCustomer
 from tabs.addFile import AddFile
 from tabs.dashboard import Dashboard
 from tabs.about import About
+from tabs.customers import Customer
 from tabs.helpMenu import HelpMenu
 from tabs.addLoanRequest import AddLoanRequest
 
@@ -21,7 +22,7 @@ class Finoshok:
         
         #making submenubarss
         submenu = Menu(mainMenubar, tearoff=0)
-        submenu.add_command(label="Customers")
+        submenu.add_command(label="Customers", command=self.customer)
         submenu.add_command(label="Add Customer", command=self.addCustomer)
 
         submenu.add_checkbutton(label="Dummy_check")
@@ -177,7 +178,11 @@ class Finoshok:
     #function personalFinance will handle actions related to the user's own finance
     def personalFinance(self):
         self.addTab("Personal Finance")
-        pass
+
+    def customer(self):
+        tabName = self.addTab("Customers")
+        Customer(self.tabsDictionary[tabName])
+
 
 
 if __name__=="__main__":
