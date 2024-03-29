@@ -86,6 +86,9 @@ class Finoshok:
         #creating a addFileObjects variable because to hold addFile class objects
         self.addFileObjects = []
 
+        #creating a customerObjects variable because to hold Customer class objects
+        self.customerObjects = []
+
         #creating uncloasable dashboard
         self.addTab("Dashboard", closeBtn=False)
         Dashboard(self.tabsDictionary["Dashboard"])
@@ -179,9 +182,11 @@ class Finoshok:
     def personalFinance(self):
         self.addTab("Personal Finance")
 
+    #this function will create a custoemr tab where you can search for custoemrs and know their details
     def customer(self):
-        tabName = self.addTab("Customers")
-        Customer(self.tabsDictionary[tabName])
+        tabName = self.addTab("Customers", multiple=True)
+        # adding contents of Customer class to the Custoemrs tab
+        self.customerObjects.append(Customer(self.tabsDictionary[tabName]))
 
 
 
