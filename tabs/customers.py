@@ -145,6 +145,9 @@ class Customers:
         wAddresssEntryLabel = Label(detailsInnerFrame, text="kankroli")
         wAddresssEntryLabel.grid(row=3, column=1)
         
+        #view customer button
+        viewCustomerButton = Button(customerDetailsFrame, text="View Customer", bg="pink")
+        viewCustomerButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
 if __name__ == "__main__":
     root = Tk()
     root.geometry("500x500")
