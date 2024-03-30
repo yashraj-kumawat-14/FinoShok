@@ -38,44 +38,54 @@ class Customers:
         customerListFrame.pack(fill="both", expand=True)
 
         #work of searchFrame starts here
-        searchFrame.columnconfigure(3, weight=1)
+        searchFrame.columnconfigure(2, weight=1)
 
         searchLabel = Label(searchFrame, text="Search here : ")
         searchLabel.grid(row=0, column=0)
 
-        searchEntry = Entry(searchFrame)
-        searchEntry.grid(row=0, column=1)
+        self.searchEntry = Entry(searchFrame)
+        self.searchEntry.grid(row=0, column=1)
 
-        searchButton = Button(searchFrame, text="Search", bg="orange")
-        searchButton.grid(row=0, column=2)
+        refreshButton = Button(searchFrame, text=u"\u21BB", bg="orange", font="COPPER 12", height=1, width=3, command=self.refresh)
+        refreshButton.grid(row=0, column=2, sticky="e")
 
-        filterButton = Button(searchFrame, text="Filter")
-        filterButton.grid(row=0, column=3, sticky="e")
+        # filterButton = Button(searchFrame, text="Filter")
+        # filterButton.grid(row=0, column=3, sticky="e")
 
         #work of searchFrame ends here
 
         #work of customerListFrame starts here
         
         #creating a listbox
-        customerListBox = Listbox(customerListFrame)
-        customerListBox.pack(fill="both", expand=True)
+        self.customerListBox = Listbox(customerListFrame, selectmode="browse")
+        self.customerListBox.pack(fill="both", expand=True)
 
         # creating scrollbar for y direction
-        scrollY = Scrollbar(customerListBox, command=customerListBox.yview)
+        scrollY = Scrollbar(self.customerListBox, command=self.customerListBox.yview)
         scrollY.pack(side="right", fill="y")
-        customerListBox.config(yscrollcommand=scrollY.set)
+        self.customerListBox.config(yscrollcommand=scrollY.set)
 
         #creating scrollbar for x dirextion
-        scrollX = Scrollbar(customerListBox, command=customerListBox.xview, orient="horizontal")
+        scrollX = Scrollbar(self.customerListBox, command=self.customerListBox.xview, orient="horizontal")
         scrollX.pack(side="bottom", fill="x")
-        customerListBox.config(xscrollcommand=scrollX.set)
+        self.customerListBox.config(xscrollcommand=scrollX.set)
 
         #getting data from database
         data = Customer().readAllData()
 
+        #creating an empty list initailly which will store dictionary containing individual customer data
+        self.dataList = []
+
+        #creating temporary datalist
+        self.tempDataList = []
+
         #inserting data initially into listbox
         for customer in data:
-            customerListBox.insert(END, f"customer Id : {customer[0]} | Name {customer[1]} | Mobile :{customer[3]} | Aadhar : {customer[6]}")
+            self.dataList.append({"name":customer[1], "mobile": customer[3], "aadhar":customer[6]})
+
+        #binding enty and listbox to their respective fucntions
+        self.searchEntry.bind("<KeyRelease>", self.search)        #Keyrelease because event actually fires  before entry wicget insert texts.
+        self.customerListBox.bind("<<ListboxSelect>>", self.dynamicDetails)
 
         #work of customerListFrame ends here
             
@@ -120,34 +130,104 @@ class Customers:
         detailsInnerFrame.grid(row=0, column=0)
 
         #creating labels static
-        customerNameLabel = Label(detailsInnerFrame, text="Customer Name : ")
+        customerNameLabel = Label(detailsInnerFrame, text="Name : ")
         customerNameLabel.grid(row=0, column=0)
 
-        civilScoreLabel = Label(detailsInnerFrame, text="Civil Score : ")
-        civilScoreLabel.grid(row=1, column=0)
+        aadharLabel = Label(detailsInnerFrame, text="Aadhar : ")
+        aadharLabel.grid(row=1, column=0)
 
         mobileLabel = Label(detailsInnerFrame, text="Mobile : ")
         mobileLabel.grid(row=2, column=0)
 
-        workAddressLabel = Label(detailsInnerFrame, text="Work Address : ")
-        workAddressLabel.grid(row=3, column=0)
-
         #creating labels dynamic
-        customerEntryLabel = Label(detailsInnerFrame, text="Yashraj")
-        customerEntryLabel.grid(row=0, column=1)
+        self.customerEntryLabel = Label(detailsInnerFrame, text="Yashraj")
+        self.customerEntryLabel.grid(row=0, column=1)
 
-        civilScoreEntryLabel = Label(detailsInnerFrame, text="9 ")
-        civilScoreEntryLabel.grid(row=1, column=1)
+        self.aadharEntryLabel = Label(detailsInnerFrame, text="989898989012 ")
+        self.aadharEntryLabel.grid(row=1, column=1)
 
-        mobileEntryLabel = Label(detailsInnerFrame, text="7357446466")
-        mobileEntryLabel.grid(row=2, column=1)
-        
-        wAddresssEntryLabel = Label(detailsInnerFrame, text="kankroli")
-        wAddresssEntryLabel.grid(row=3, column=1)
+        self.mobileEntryLabel = Label(detailsInnerFrame, text="7357446466")
+        self.mobileEntryLabel.grid(row=2, column=1)
         
         #view customer button
-        viewCustomerButton = Button(customerDetailsFrame, text="View Customer", bg="pink")
-        viewCustomerButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
+        self.viewCustomerButton = Button(customerDetailsFrame, text="View Customer", bg="pink")
+        self.viewCustomerButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
+
+        #initially invoking search funtion
+        self.search(None)
+        self.customerListBox.selection_set(0)
+        self.dynamicDetails(None)
+    
+    #it will display data in listbox according to the search query
+    def search(self, event):
+        if(self.searchEntry.get()):
+            #search according to aadhar, mobile, name
+            searchText = self.searchEntry.get()
+            self.tempDataList = []
+
+            for customer in self.dataList:
+                if(searchText in str(customer["aadhar"]) or searchText in customer["name"] or searchText in str(customer["mobile"])):
+                    self.tempDataList.append(customer)
+
+            self.customerListBox.delete(0, END)
+            for customer in self.tempDataList:
+                self.customerListBox.insert(END, f"Name {customer["name"]} | Mobile :{customer["mobile"]} | Aadhar : {customer["aadhar"]}")
+        else:
+            #clearing all the previous data in listbox and tempDataList and reinserting all the data
+            self.customerListBox.delete(0, END)
+
+            for customer in self.dataList:
+                self.customerListBox.insert(END, f"Name {customer["name"]} | Mobile :{customer["mobile"]} | Aadhar : {customer["aadhar"]}")
+                self.tempDataList.append({"name":customer["name"], "mobile": customer["mobile"], "aadhar":customer["aadhar"]})
+            
+    #this function dynamically changes details in detailframe according to the currentselection in customerlistbox
+    def dynamicDetails(self, event):
+        if(self.customerListBox.curselection()):
+            #dynamic updating details and photo
+            self.customerEntryLabel.config(text=f"{self.tempDataList[self.customerListBox.curselection()[0]]["name"]}")
+            self.mobileEntryLabel.config(text=f"{self.tempDataList[self.customerListBox.curselection()[0]]["mobile"]}")
+            self.aadharEntryLabel.config(text=f"{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}")
+            #creating a PIL image object
+            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}.jpg"
+            
+            #if error found during imaging loading then use default image
+            try:
+                img=Image.open(PhotoPath)
+            
+                #resizing the image
+                img=img.resize((82,80))
+
+                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+                self.customerPhoto = ImageTk.PhotoImage(img)
+                self.customerPhotoLabel.config(image=self.customerPhoto)
+            except:
+                PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+                img=Image.open(PhotoPath)
+            
+                #resizing the image
+                img=img.resize((82,80))
+
+                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+                self.customerPhoto = ImageTk.PhotoImage(img)
+                self.customerPhotoLabel.config(image=self.customerPhoto)
+        
+    def refresh(self):
+        #getting data from database
+        data = Customer().readAllData()
+
+        #creating an empty list initailly which will store dictionary containing individual customer data
+        self.dataList = []
+
+        #creating temporary datalist
+        self.tempDataList = []
+
+        #inserting data initially into listbox
+        for customer in data:
+            self.dataList.append({"name":customer[1], "mobile": customer[3], "aadhar":customer[6]})
+        
+        self.search(None)
+
+
 if __name__ == "__main__":
     root = Tk()
     root.geometry("500x500")

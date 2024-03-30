@@ -11,6 +11,7 @@ from tabs.dashboard import Dashboard
 from tabs.about import About
 from tabs.customers import Customers
 from tabs.helpMenu import HelpMenu
+from tabs.client import Client
 from tabs.addLoanRequest import AddLoanRequest
 
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
@@ -88,6 +89,9 @@ class Finoshok:
 
         #creating a customerObjects variable because to hold Customer class objects
         self.customerObjects = []
+
+        #creating a viewCustomerObjects variable because to hold Customers class objects
+        self.viewCustomerObjects = []
 
         #creating uncloasable dashboard
         self.addTab("Dashboard", closeBtn=False)
@@ -182,11 +186,21 @@ class Finoshok:
     def personalFinance(self):
         self.addTab("Personal Finance")
 
-    #this function will create a custoemr tab where you can search for custoemrs and know their details
+    #this function will create a customers tab where you can search for custoemrs and know their details
     def customer(self):
         tabName = self.addTab("Customers", multiple=True)
         # adding contents of Customer class to the Custoemrs tab
-        self.customerObjects.append(Customers(self.tabsDictionary[tabName]))
+        tempObject =Customers(self.tabsDictionary[tabName])
+        #configuring function for viewCustomerButton in Customers Class
+        tempObject.viewCustomerButton.config(command=lambda customerObject=tempObject:self.viewCustomer(customerObject))
+        #now appending the tempObject to customerObjects
+        self.customerObjects.append(tempObject)
+
+    #this function makes a tab to show profile of particular customer
+    def viewCustomer(self, customerObject):
+        tabName = self.addTab(f"{customerObject.tempDataList[customerObject.customerListBox.curselection()[0]]["name"]}", multiple=True)
+        #appending the Client object into viewCustomerObjects
+        self.viewCustomerObjects.append(Client(self.tabsDictionary[tabName]))
 
 
 
