@@ -164,12 +164,12 @@ class AddFile:
         totalEmiEntry = Entry(section2, state="disable")
         totalEmiEntry.grid(row=6, column=1)
 
-        #entryList which holds all entries
-        entryList = [loanPeriodEntry, emiAmountEntry, totalEmiEntry, interestEntry, amountApprovedEntry]
-
         #creating save button
-        saveDataButton = Button(section2, text="Save", bg="orange")
+        saveDataButton = Button(section2, text="Save", bg="orange", state="disable")
         saveDataButton.grid(row=7, columnspan=3, sticky="nsew")
+
+        #entryList which holds all entries
+        entryList = [loanPeriodEntry, emiAmountEntry, totalEmiEntry, interestEntry, amountApprovedEntry, saveDataButton]
 
         #section 2 work endss ----
             

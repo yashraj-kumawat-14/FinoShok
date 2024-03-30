@@ -1,9 +1,14 @@
 #Customers module to show list of customers present in the database using customer model
 from tkinter import Tk, Frame, Listbox, Scrollbar, Label, Entry, Button, END
 from PIL import Image, ImageTk
+#importign sys.path so that we can add model folder to search path
+from sys import path
+path.append(r"D:\projects\finoshok\finoshok\model")
+#now we can import Customer class successfully from customer model
+from Customer import Customer
 
 #this is customer class which creates a object for searching customers and getting their information
-class Customer:
+class Customers:
     def __init__(self, customerWindow) :
         #customerwindow can be a frame or a tk object
 
@@ -64,8 +69,13 @@ class Customer:
         scrollX = Scrollbar(customerListBox, command=customerListBox.xview, orient="horizontal")
         scrollX.pack(side="bottom", fill="x")
         customerListBox.config(xscrollcommand=scrollX.set)
-        for i in range(100):
-            customerListBox.insert(END, f"customer Id : {i} | name {"Yash"} | amount : 34000 | date : 2/2/2 | mobile : 9999999999 | aadhar : 123456789012")
+
+        #getting data from database
+        data = Customer().readAllData()
+
+        #inserting data initially into listbox
+        for customer in data:
+            customerListBox.insert(END, f"customer Id : {customer[0]} | Name {customer[1]} | Mobile :{customer[3]} | Aadhar : {customer[6]}")
 
         #work of customerListFrame ends here
             
@@ -139,5 +149,5 @@ if __name__ == "__main__":
     root = Tk()
     root.geometry("500x500")
     root.title("Customers")
-    a = Customer(root)
+    a = Customers(root)
     root.mainloop()

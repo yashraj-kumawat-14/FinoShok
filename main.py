@@ -9,7 +9,7 @@ from tabs.addCustomer import AddCustomer
 from tabs.addFile import AddFile
 from tabs.dashboard import Dashboard
 from tabs.about import About
-from tabs.customers import Customer
+from tabs.customers import Customers
 from tabs.helpMenu import HelpMenu
 from tabs.addLoanRequest import AddLoanRequest
 
@@ -186,7 +186,7 @@ class Finoshok:
     def customer(self):
         tabName = self.addTab("Customers", multiple=True)
         # adding contents of Customer class to the Custoemrs tab
-        self.customerObjects.append(Customer(self.tabsDictionary[tabName]))
+        self.customerObjects.append(Customers(self.tabsDictionary[tabName]))
 
 
 
