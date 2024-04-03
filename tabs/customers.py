@@ -1,5 +1,5 @@
 #Customers module to show list of customers present in the database using customer model
-from tkinter import Tk, Frame, Listbox, Scrollbar, Label, Entry, Button, END
+from tkinter import Tk, Frame, Listbox, Scrollbar, Label, Entry, Button, END, StringVar
 from PIL import Image, ImageTk
 #importign sys.path so that we can add model folder to search path
 from sys import path
@@ -81,7 +81,7 @@ class Customers:
 
         #inserting data initially into listbox
         for customer in data:
-            self.dataList.append({"name":customer[1], "mobile": customer[3], "aadhar":customer[6]})
+            self.dataList.append({"name":customer[1], "mobile": customer[3], "aadhar":customer[6], "father":customer[2], "home_address":customer[4], "work_address":customer[5]})
 
         #binding enty and listbox to their respective fucntions
         self.searchEntry.bind("<KeyRelease>", self.search)        #Keyrelease because event actually fires  before entry wicget insert texts.
@@ -140,14 +140,17 @@ class Customers:
         mobileLabel.grid(row=2, column=0)
 
         #creating labels dynamic
-        self.customerEntryLabel = Label(detailsInnerFrame, text="Yashraj")
-        self.customerEntryLabel.grid(row=0, column=1)
+        self.customerEntryVar = StringVar()
+        customerEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.customerEntryVar)
+        customerEntry.grid(row=0, column=1)
 
-        self.aadharEntryLabel = Label(detailsInnerFrame, text="989898989012 ")
-        self.aadharEntryLabel.grid(row=1, column=1)
+        self.aadharEntryVar = StringVar()
+        aadharEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
+        aadharEntry.grid(row=1, column=1)
 
-        self.mobileEntryLabel = Label(detailsInnerFrame, text="7357446466")
-        self.mobileEntryLabel.grid(row=2, column=1)
+        self.mobileEntryVar = StringVar()
+        mobileEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
+        mobileEntry.grid(row=2, column=1)
         
         #view customer button
         self.viewCustomerButton = Button(customerDetailsFrame, text="View Customer", bg="pink")
@@ -184,9 +187,12 @@ class Customers:
     def dynamicDetails(self, event):
         if(self.customerListBox.curselection()):
             #dynamic updating details and photo
-            self.customerEntryLabel.config(text=f"{self.tempDataList[self.customerListBox.curselection()[0]]["name"]}")
-            self.mobileEntryLabel.config(text=f"{self.tempDataList[self.customerListBox.curselection()[0]]["mobile"]}")
-            self.aadharEntryLabel.config(text=f"{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}")
+
+            #setting new data
+            self.customerEntryVar.set(f"{self.tempDataList[self.customerListBox.curselection()[0]]["name"]}")
+            self.mobileEntryVar.set(f"{self.tempDataList[self.customerListBox.curselection()[0]]["mobile"]}")
+            self.aadharEntryVar.set(f"{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}")
+
             #creating a PIL image object
             PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}.jpg"
             
@@ -224,8 +230,11 @@ class Customers:
         #inserting data initially into listbox
         for customer in data:
             self.dataList.append({"name":customer[1], "mobile": customer[3], "aadhar":customer[6]})
+        print(self.dataList)
         
         self.search(None)
+        self.customerListBox.selection_set(0)
+        self.dynamicDetails(None)
 
 
 if __name__ == "__main__":

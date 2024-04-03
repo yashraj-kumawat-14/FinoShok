@@ -11,7 +11,7 @@ from tabs.dashboard import Dashboard
 from tabs.about import About
 from tabs.customers import Customers
 from tabs.helpMenu import HelpMenu
-from tabs.client import Client
+from tabs.profile import Profile
 from tabs.addLoanRequest import AddLoanRequest
 
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
@@ -198,9 +198,22 @@ class Finoshok:
 
     #this function makes a tab to show profile of particular customer
     def viewCustomer(self, customerObject):
-        tabName = self.addTab(f"{customerObject.tempDataList[customerObject.customerListBox.curselection()[0]]["name"]}", multiple=True)
+        tabName = self.addTab(customerObject.customerEntryVar.get())
         #appending the Client object into viewCustomerObjects
-        self.viewCustomerObjects.append(Client(self.tabsDictionary[tabName]))
+        self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus))
+    
+    #this functions changes status in stausbar and tabname's
+    def updateStatus(self, **kwargs):
+        data = kwargs
+        dataKeys = data.keys()
+        if("tabName" in dataKeys):
+            #getting index of current tab
+            index = self.myNotebook.index("current")
+            
+            #changing tabName of current selectedTab
+            newTabName = self.myNotebook.tab(index, text=data["tabName"])
+            
+
 
 
 

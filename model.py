@@ -120,10 +120,12 @@ class Model:
             formattedString = ""
             for i in range(len(data)):
                 formattedString+= columns[i]+"="+values[i]
+                if(i!=len(data)-1):
+                    formattedString+=","
             
             #creating a database object
             object = Database()
-
+            
             #returning true means succeessful insertion and false for unsuccessfull  insertion
             return (object.dataModify(f"update `{self.tableName}` SET {formattedString} where `id` = {id}"))
     
@@ -144,7 +146,7 @@ class Model:
         tempValues = list(data.values())
 
         for value in tempValues:
-            values.append("'"+value+"'")
+            values.append("'"+str(value)+"'")
 
         #FORMATED STRING
         formattedString = ""
