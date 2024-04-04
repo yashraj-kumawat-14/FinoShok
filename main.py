@@ -200,7 +200,8 @@ class Finoshok:
     def viewCustomer(self, customerObject):
         tabName = self.addTab(customerObject.customerEntryVar.get())
         #appending the Client object into viewCustomerObjects
-        self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus))
+        if(tabName):
+            self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus))
     
     #this functions changes status in stausbar and tabname's
     def updateStatus(self, **kwargs):

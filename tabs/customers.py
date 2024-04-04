@@ -81,7 +81,7 @@ class Customers:
 
         #inserting data initially into listbox
         for customer in data:
-            self.dataList.append({"name":customer[1], "mobile": customer[3], "aadhar":customer[6], "father":customer[2], "home_address":customer[4], "work_address":customer[5]})
+            self.dataList.append({"id":customer[0], "name":customer[1], "mobile": customer[3], "aadhar":customer[6], "father":customer[2], "home_address":customer[4], "work_address":customer[5]})
 
         #binding enty and listbox to their respective fucntions
         self.searchEntry.bind("<KeyRelease>", self.search)        #Keyrelease because event actually fires  before entry wicget insert texts.
@@ -181,7 +181,7 @@ class Customers:
 
             for customer in self.dataList:
                 self.customerListBox.insert(END, f"Name {customer["name"]} | Mobile :{customer["mobile"]} | Aadhar : {customer["aadhar"]}")
-                self.tempDataList.append({"name":customer["name"], "mobile": customer["mobile"], "aadhar":customer["aadhar"]})
+                self.tempDataList.append({"id":customer["id"],"name":customer["name"], "mobile": customer["mobile"], "aadhar":customer["aadhar"]})
             
     #this function dynamically changes details in detailframe according to the currentselection in customerlistbox
     def dynamicDetails(self, event):
@@ -194,7 +194,7 @@ class Customers:
             self.aadharEntryVar.set(f"{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}")
 
             #creating a PIL image object
-            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}.jpg"
+            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.tempDataList[self.customerListBox.curselection()[0]]["id"]}.jpg"
             
             #if error found during imaging loading then use default image
             try:
@@ -229,8 +229,7 @@ class Customers:
 
         #inserting data initially into listbox
         for customer in data:
-            self.dataList.append({"name":customer[1], "mobile": customer[3], "aadhar":customer[6]})
-        print(self.dataList)
+            self.dataList.append({"id":customer[0],"name":customer[1], "mobile": customer[3], "aadhar":customer[6]})
         
         self.search(None)
         self.customerListBox.selection_set(0)

@@ -155,7 +155,7 @@ class Profile:
             self.customerPhotoLabel = Label(PhotoFrame)
             self.customerPhotoLabel.grid(row=0, column=0)
             try:
-                PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.data[0][6]}.jpg"
+                PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.data[0][0]}.jpg"
                 img=Image.open(PhotoPath)
             
                 #resizing the image
