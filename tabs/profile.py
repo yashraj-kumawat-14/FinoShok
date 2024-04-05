@@ -30,91 +30,61 @@ class Profile:
         #configuring rows and columns so to make responsive grid system
         mainFrame.rowconfigure(0, weight=1)
         mainFrame.rowconfigure(1, weight=1)
-        mainFrame.rowconfigure(2, weight=1)
+        # mainFrame.rowconfigure(2, weight=1)
         mainFrame.columnconfigure(0, weight=1)
+        mainFrame.columnconfigure(1, weight=1)
+        mainFrame.columnconfigure(2, weight=1)
         
         #creting two subframes in mainframe
-        subFrame1 = Frame(mainFrame, bg="brown")
+        subFrame1 = Frame(mainFrame, borderwidth=3, relief="groove")
         subFrame1.grid(row=0, column=0, sticky="nsew")
+        # subFrame1.grid_propagate(False)
 
-        subFrame2 = Frame(mainFrame, bg='orange')
+        subFrame2 = Frame(mainFrame, borderwidth=3, relief="groove")
         subFrame2.grid(row=1, column=0, sticky="nsew", rowspan=2)
 
-        #configuring grids in subframe1
-        subFrame1.rowconfigure(0, weight=1)
+        subFrame3 = Frame(mainFrame, borderwidth=3, relief="groove")
+        subFrame3.grid(row=0, column=1, sticky="nsew", rowspan=2, columnspan=2)
 
-        for i in range(6):
-            subFrame1.columnconfigure(i, weight=1)
+        #subframe1 work starts here
+        profileDetailsLabel = Label(subFrame1, text="Profile Details", font="COPPER 20", bg="orange")
+        profileDetailsLabel.pack(fill="x")
 
-        #creating navigation and details frame in subframe1
-        navsubFrame1 = Frame(subFrame1, bg="yellow")
-        navsubFrame1.grid(row=0, column=0, sticky="nsew")
-
-        self.detailsFrame = Frame(subFrame1, bg='green')
-        self.detailsFrame.grid(row=0, column=1, sticky="nsew", columnspan=5)
-
-        #configuring grids in subframe2
-        subFrame2.rowconfigure(0, weight=1)
-
-        for i in range(6):
-            subFrame2.columnconfigure(i, weight=1)
-
-        #creating navigation and excel frame in subframe2
-        navsubFrame2 = Frame(subFrame2, bg="blue")
-        navsubFrame2.grid(row=0, column=0, sticky="nsew")
-
-        excelFrame = Frame(subFrame2, bg='violet')
-        excelFrame.grid(row=0, column=1, sticky="nsew", columnspan=5)
-
-        #creating radio buttons in both nav1 and nav2
-        self.navsubFrameVar1 = StringVar()
-        self.navsubFrameVar1.set("1")
-        
-        navsubFrame1.rowconfigure(0, weight=1)
-        navsubFrame1.columnconfigure(0, weight=1)
-
-        innerNavSubFrame1 = Frame(navsubFrame1)
-        innerNavSubFrame1.grid(row=0, column=0)
-
-        customerRadio = Radiobutton(innerNavSubFrame1, text="Customer Profile", variable=self.navsubFrameVar1, value="1", command=lambda:self.detailsFrameController())
-        customerRadio.grid(row=0, column=0, sticky="w")
-        
-        guarranterRadio = Radiobutton(innerNavSubFrame1, text="Guarranters", variable=self.navsubFrameVar1, value="2", command=self.detailsFrameController)
-        guarranterRadio.grid(row=1, column=0, sticky="w")
-
-        self.navsubFrameVar2 = StringVar()
-        self.navsubFrameVar2.set("1")
-        
-        for i in range(9):
-            navsubFrame2.rowconfigure(i, weight=1)
-        
-        navsubFrame2.columnconfigure(0, weight=1)
-
-        innerNavSubFrame2 = Frame(navsubFrame2)
-        innerNavSubFrame2.grid(row=0, column=0, sticky="nwes")
-
-        innerNavSubFrame2.rowconfigure(0, weight=1)
-        innerNavSubFrame2.rowconfigure(1, weight=1)
-        innerNavSubFrame2.columnconfigure(0, weight=1)
-
-        vehiclesRadio = Radiobutton(innerNavSubFrame2, text="Vehicles", variable=self.navsubFrameVar2, value="1")
-        vehiclesRadio.grid(row=0, column=0, sticky="sw")
-        
-        filesRadio = Radiobutton(innerNavSubFrame2, text="Files", variable=self.navsubFrameVar2, value="2")
-        filesRadio.grid(row=1, column=0, sticky="nw")
-
-        #creating a listbox in nav2 frame
-        dynamicListBox = Listbox(navsubFrame2)
-        dynamicListBox.grid(row=1, column=0, sticky="nswe", rowspan=8)
+        self.detailsFrame = Frame(subFrame1, bg="black")
+        self.detailsFrame.pack(fill="both", expand=True)
 
         #getting data relavent to customer with aadharnumber stored in self.aadharNuber
         customerObject = Customer()
         self.data = customerObject.whereData(aadhar=str(self.aadharNumber))
 
+        #subframe1 work ends here
+
         #now invoking detailsConstroller method initiallly
         self.detailsFrameController()
 
-    #this method is used to change content present in detailsFrame acording to the value of radio buttonsi nav1
+        #subframe2 work starts here
+        navsubFrame2 = Frame(subFrame2, borderwidth=2, relief="raised")
+        navsubFrame2.pack(fill="x")
+
+        #configuring grid area
+        navsubFrame2.columnconfigure(0, weight=1)
+        navsubFrame2.columnconfigure(1, weight=1)
+
+        #navigation radio buttons
+        self.navsubFrameVar2 = IntVar()
+        self.navsubFrameVar2.set(1)
+        
+        #creating radiobuttons
+        filesRadioButton = Radiobutton(navsubFrame2, text="Files", value=1, variable=self.navsubFrameVar2)
+        filesRadioButton.grid(row=0, column=0)
+
+        vehiclesRadioButton = Radiobutton(navsubFrame2, text="Vehicles",value=2, variable=self.navsubFrameVar2)
+        vehiclesRadioButton.grid(row=0, column=1)
+
+        #creating listbox
+        self.dataListBox = Listbox(subFrame2)
+        self.dataListBox.pack(fill="both", expand=True)
+    #
     def detailsFrameController(self):
 
         #first things is to delete all the widgets present in self.detailsFrame
@@ -123,144 +93,140 @@ class Profile:
         for child in children:
             child.destroy()
 
-        #creating new widgets according to value of self.navsubFrameVar1
+        if(self.data):
+            #extracting data from self.data property of object which was defined in __init__ method
+            customerData = {"name":self.data[0][1], "aadhar":self.data[0][6], "mobile":self.data[0][3], "father":self.data[0][2], "homeAddress":self.data[0][4], "workAddress":self.data[0][5]}
 
-        #if user selected a radio button whose value is 1 then; 
-        if(self.navsubFrameVar1.get()=="1"):
-            if(self.data):
-                #extracting data from self.data property of object which was defined in __init__ method
-                customerData = {"name":self.data[0][1], "aadhar":self.data[0][6], "mobile":self.data[0][3], "father":self.data[0][2], "homeAddress":self.data[0][4], "workAddress":self.data[0][5]}
+        else:
+            #if self.data is empty then default value of customerData is created
+            customerData = {"name":"", "aadhar":"", "mobile":"", "father":"", "homeAddress":"", "workAddress":""}
 
-            else:
-                #if self.data is empty then default value of customerData is created
-                customerData = {"name":"", "aadhar":"", "mobile":"", "father":"", "homeAddress":"", "workAddress":""}
+        self.detailsFrame.rowconfigure(0, weight=1)
+        self.detailsFrame.columnconfigure(0, weight=1)
 
-            self.detailsFrame.rowconfigure(0, weight=1)
-            self.detailsFrame.columnconfigure(0, weight=1)
-
-            self.customerDetailsFrame = Frame(self.detailsFrame)
-            self.customerDetailsFrame.grid(row=0, column=0)
+        self.customerDetailsFrame = Frame(self.detailsFrame)
+        self.customerDetailsFrame.grid(row=0, column=0)
                 
-            #creating two frames PhotoFrame and Details inside self.customerDetailsFrame
-            PhotoFrame = Frame(self.customerDetailsFrame, relief="groove", border=3)
-            PhotoFrame.grid(row=0, column=0, sticky="nsew")
+        #creating two frames PhotoFrame and Details inside self.customerDetailsFrame
+        PhotoFrame = Frame(self.customerDetailsFrame, relief="groove", border=3)
+        PhotoFrame.grid(row=0, column=0, sticky="nsew")
 
-            Details = Frame(self.customerDetailsFrame, relief="groove", border=3)
-            Details.grid(row=0, column=1, sticky="nsew")
+        Details = Frame(self.customerDetailsFrame, relief="groove", border=3)
+        Details.grid(row=0, column=1, sticky="nsew")
 
-            #creating responsive PhotoFrame
-            PhotoFrame.rowconfigure(0, weight=1)
-            PhotoFrame.columnconfigure(0, weight=1)
+        #creating responsive PhotoFrame
+        PhotoFrame.rowconfigure(0, weight=1)
+        PhotoFrame.columnconfigure(0, weight=1)
 
-            #creating a PIL image object
+        #creating a PIL image object
             
-            #if error found during imaging loading then use default image
-             #now integrating the image into label widget and positioning it via grid 
-            self.customerPhotoLabel = Label(PhotoFrame)
-            self.customerPhotoLabel.grid(row=0, column=0)
-            try:
-                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.data[0][0]}.jpg"
-                img=Image.open(self.photoPath)
+        #if error found during imaging loading then use default image
+        #now integrating the image into label widget and positioning it via grid 
+        self.customerPhotoLabel = Label(PhotoFrame)
+        self.customerPhotoLabel.grid(row=0, column=0)
+        try:
+            self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.data[0][0]}.jpg"
+            img=Image.open(self.photoPath)
             
-                #resizing the image
-                img=img.resize((82,120))
+            #resizing the image
+            img=img.resize((82,120))
 
-                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
-                self.customerPhoto = ImageTk.PhotoImage(img)
-                self.customerPhotoLabel.config(image=self.customerPhoto)
-            except:
-                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
-                img=Image.open(self.photoPath)
+            #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+            self.customerPhoto = ImageTk.PhotoImage(img)
+            self.customerPhotoLabel.config(image=self.customerPhoto)
+        except:
+            self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+            img=Image.open(self.photoPath)
             
-                #resizing the image
-                img=img.resize((82,120))
+            #resizing the image
+            img=img.resize((82,120))
 
-                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
-                self.customerPhoto = ImageTk.PhotoImage(img)
-                self.customerPhotoLabel.config(image=self.customerPhoto)
+            #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+            self.customerPhoto = ImageTk.PhotoImage(img)
+            self.customerPhotoLabel.config(image=self.customerPhoto)
             
-            finally:
-                self.photoPath = None
+        finally:
+            self.photoPath = None
 
-            #creating responsive sec3Details frame
-            Details.rowconfigure(0, weight=1)
-            Details.columnconfigure(0, weight=1)
+        #creating responsive sec3Details frame
+        Details.rowconfigure(0, weight=1)
+        Details.columnconfigure(0, weight=1)
             
-            #creating a inner subFramee detailsInnerFrame inside sec3details
-            detailsInnerFrame = Frame(Details)
-            detailsInnerFrame.grid(row=0, column=0)
+        #creating a inner subFramee detailsInnerFrame inside sec3details
+        detailsInnerFrame = Frame(Details)
+        detailsInnerFrame.grid(row=0, column=0)
 
-            #creating labels static
-            customerNameLabel = Label(detailsInnerFrame, text="Name : ")
-            customerNameLabel.grid(row=0, column=0)
+        #creating labels static
+        customerNameLabel = Label(detailsInnerFrame, text="Name : ")
+        customerNameLabel.grid(row=0, column=0)
 
-            aadharLabel = Label(detailsInnerFrame, text="Aadhar : ")
-            aadharLabel.grid(row=1, column=0)
+        aadharLabel = Label(detailsInnerFrame, text="Aadhar : ")
+        aadharLabel.grid(row=1, column=0)
 
-            mobileLabel = Label(detailsInnerFrame, text="Mobile : ")
-            mobileLabel.grid(row=2, column=0)
+        mobileLabel = Label(detailsInnerFrame, text="Mobile : ")
+        mobileLabel.grid(row=2, column=0)
 
-            fatherLabel = Label(detailsInnerFrame, text="Father : ")
-            fatherLabel.grid(row=3, column=0)
+        fatherLabel = Label(detailsInnerFrame, text="Father : ")
+        fatherLabel.grid(row=3, column=0)
 
-            homeAddressLabel = Label(detailsInnerFrame, text="Home Address : ")
-            homeAddressLabel.grid(row=4, column=0)
+        homeAddressLabel = Label(detailsInnerFrame, text="Home Address : ")
+        homeAddressLabel.grid(row=4, column=0)
 
-            workAddressLabel = Label(detailsInnerFrame, text="Work Address : ")
-            workAddressLabel.grid(row=5, column=0)
+        workAddressLabel = Label(detailsInnerFrame, text="Work Address : ")
+        workAddressLabel.grid(row=5, column=0)
 
-            #creating labels dynamic
-            self.customerEntryVar = StringVar()
-            self.customerEntryVar.set(customerData["name"])
-            customerEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.customerEntryVar)
-            customerEntry.grid(row=0, column=1)
+        #creating labels dynamic
+        self.customerEntryVar = StringVar()
+        self.customerEntryVar.set(customerData["name"])
+        customerEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.customerEntryVar)
+        customerEntry.grid(row=0, column=1)
 
-            self.aadharEntryVar = StringVar()
-            self.aadharEntryVar.set(customerData["aadhar"])
-            aadharEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
-            aadharEntry.grid(row=1, column=1)
+        self.aadharEntryVar = StringVar()
+        self.aadharEntryVar.set(customerData["aadhar"])
+        aadharEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
+        aadharEntry.grid(row=1, column=1)
 
-            self.mobileEntryVar = StringVar()
-            self.mobileEntryVar.set(customerData["mobile"])
-            mobileEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
-            mobileEntry.grid(row=2, column=1)
+        self.mobileEntryVar = StringVar()
+        self.mobileEntryVar.set(customerData["mobile"])
+        mobileEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
+        mobileEntry.grid(row=2, column=1)
 
-            self.fatherEntryVar = StringVar()
-            self.fatherEntryVar.set(customerData["father"])
-            fatherEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.fatherEntryVar)
-            fatherEntry.grid(row=3, column=1)
+        self.fatherEntryVar = StringVar()
+        self.fatherEntryVar.set(customerData["father"])
+        fatherEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.fatherEntryVar)
+        fatherEntry.grid(row=3, column=1)
 
-            self.homeAddressEntryVar = StringVar()
-            self.homeAddressEntryVar.set(customerData["homeAddress"])
-            homeAddressEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.homeAddressEntryVar)
-            homeAddressEntry.grid(row=4, column=1)
+        self.homeAddressEntryVar = StringVar()
+        self.homeAddressEntryVar.set(customerData["homeAddress"])
+        homeAddressEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.homeAddressEntryVar)
+        homeAddressEntry.grid(row=4, column=1)
 
-            self.workAddressEntryVar = StringVar()
-            self.workAddressEntryVar.set(customerData["workAddress"])
-            workAddressEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.workAddressEntryVar)
-            workAddressEntry.grid(row=5, column=1)
+        self.workAddressEntryVar = StringVar()
+        self.workAddressEntryVar.set(customerData["workAddress"])
+        workAddressEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.workAddressEntryVar)
+        workAddressEntry.grid(row=5, column=1)
 
-            # state of entries depends of emptiness of self.data
-            state = ("normal")if(self.data) else ("disable")
+        # state of entries depends of emptiness of self.data
+        state = ("normal")if(self.data) else ("disable")
 
-            #addign sll entries inside a list
-            entryList = [workAddressEntry, fatherEntry, customerEntry, homeAddressEntry, mobileEntry, aadharEntry]
+        #addign sll entries inside a list
+        entryList = [workAddressEntry, fatherEntry, customerEntry, homeAddressEntry, mobileEntry, aadharEntry]
             
-            #operation frame
-            self.operationFrame = Frame(self.customerDetailsFrame, bg="red")
-            self.operationFrame.grid(row=1, column=0, columnspan=2, sticky="we")
+        #operation frame
+        self.operationFrame = Frame(self.customerDetailsFrame, bg="red")
+        self.operationFrame.grid(row=1, column=0, columnspan=2, sticky="we")
 
-            #configuring grid area
-            self.operationFrame.rowconfigure(0, weight=1)
-            for i in range(3):
-                self.operationFrame.columnconfigure(i, weight=1)
+        #configuring grid area
+        self.operationFrame.rowconfigure(0, weight=1)
+        for i in range(4):
+            self.operationFrame.columnconfigure(i, weight=1)
 
-            #This button allows user to interact with entries and edit them
-            editButton = Button(self.customerDetailsFrame, text="Edit", state=state)
-            editButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
+        #This button allows user to interact with entries and edit them
+        editButton = Button(self.customerDetailsFrame, text="Edit", state=state, bg="orange")
+        editButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
 
-            #configuring commmand for editButton as self.edit()
-            editButton.config(command=lambda entryList=entryList, editButton=editButton: self.edit(entryList, editButton))
+        #configuring commmand for editButton as self.edit()
+        editButton.config(command=lambda entryList=entryList, editButton=editButton: self.edit(entryList, editButton))
 
     #thsi edite function changes state of entries to normal and allows user to edit them and save them
     def edit(self, entryList, editButton):
@@ -280,6 +246,10 @@ class Profile:
         #saves the changes made in edit mode by user
         saveButton = Button(self.operationFrame, text="Save", command=self.save)
         saveButton.grid(row=0, column=2, sticky="we")
+
+        #deletes the customer ,but not its relations with files
+        deleteButton = Button(self.operationFrame, text="Delete", bg="red", command=self.delete)
+        deleteButton.grid(row=0, column=3, sticky="we")
     
     #this functions saves the changes made by user in edit mode and save it to the database
     def save(self):
@@ -346,6 +316,9 @@ class Profile:
                 self.customerPhotoLabel.config(image=self.customerPhoto)
             else:
                 self.photoPath= None
+                
+    def delete(self):
+        pass
     
 
 #following code won't run until it is run from this file only
