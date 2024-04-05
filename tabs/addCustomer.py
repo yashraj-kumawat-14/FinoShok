@@ -139,8 +139,8 @@ class AddCustomer:
                 self.customerPhoto = ImageTk.PhotoImage(img)
 
                 #now integrating the image into label widget and positioning it via grid 
-                customerPhotoLabel = Label(subFrame, image=self.customerPhoto)
-                customerPhotoLabel.grid(row=6, column=1, pady=4)
+                self.customerPhotoLabel = Label(subFrame, image=self.customerPhoto)
+                self.customerPhotoLabel.grid(row=6, column=1, pady=4)
 
                 #changing the text of photoUploadButton from 'select' to 'Change' and also changing its position in the grid
                 photoSelectButton.config(text="Change")
@@ -185,24 +185,32 @@ class AddCustomer:
                 
                 if(not alreadyExists):
                     #code for saving the customer
-                    
-                    
                     #insertSuccessfully true if successfull insertion else false
                     insertSuccessfully= (customerObject.insertData(name=cNameEntry.get(), father=fNameEntry.get(), mobile=mobileEntry.get(), aadhar =aadharEntry.get(), home_address=hAddressEntry.get(), work_address=wAddressEntry.get()))
 
                     #if customer data inserted succesfully then only proceed
                     if(insertSuccessfully):
                         #adding customer's photo to assets if photoPath exists
-                        shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{aadharEntry.get()}.jpg")
+                        if(self.photoPath):
+                            #saving image as customerId.jpg
+                            customerId = customerObject.whereData(aadhar=aadharEntry.get())[0][0]
+                            shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{customerId}.jpg")
 
                         #instructing user that all things are carried out successfully
                         instructionText="Customer added to database successfully"
                         instructionLabel.config(text=instructionText, fg="green")
+
                         #removing old data from all entries
                         for entry in entryList:
                             entry.delete(0, END)
+                        
+                        #setting value of self.customerPhto to None
                         self.customerPhoto=None
-                        self.customerPhotoLabel.destroy()
+                        #destroying the the label if it was created else do nonthing and return false value
+                        self.customerPhotoLabel.destroy() if(self.photoPath) else False
+                        
+                        #changing the photbutton text
+                        photoSelectButton.config(text="select")
                         photoSelectButton.grid(row=6,column=1)
 
                     else:

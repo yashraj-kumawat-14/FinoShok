@@ -7,6 +7,10 @@ from sys import path
 #adding this path search so that interpreter can search modules and import it from this directory 
 path.append(r"D:\projects\finoshok\finoshok\model")
 from Customer import Customer
+from tkinter.filedialog import askopenfilename
+import tkinter.messagebox as message
+import shutil
+from pathConfig import CUSTOMERPHOTOPATH
 
 
 #Profile class takes one tk Window or a Frame and aadharNumber of the particular customer to show it s profile
@@ -155,8 +159,8 @@ class Profile:
             self.customerPhotoLabel = Label(PhotoFrame)
             self.customerPhotoLabel.grid(row=0, column=0)
             try:
-                PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.data[0][0]}.jpg"
-                img=Image.open(PhotoPath)
+                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.data[0][0]}.jpg"
+                img=Image.open(self.photoPath)
             
                 #resizing the image
                 img=img.resize((82,120))
@@ -165,8 +169,8 @@ class Profile:
                 self.customerPhoto = ImageTk.PhotoImage(img)
                 self.customerPhotoLabel.config(image=self.customerPhoto)
             except:
-                PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
-                img=Image.open(PhotoPath)
+                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+                img=Image.open(self.photoPath)
             
                 #resizing the image
                 img=img.resize((82,120))
@@ -174,6 +178,9 @@ class Profile:
                 #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
                 self.customerPhoto = ImageTk.PhotoImage(img)
                 self.customerPhotoLabel.config(image=self.customerPhoto)
+            
+            finally:
+                self.photoPath = None
 
             #creating responsive sec3Details frame
             Details.rowconfigure(0, weight=1)
@@ -239,6 +246,15 @@ class Profile:
             #addign sll entries inside a list
             entryList = [workAddressEntry, fatherEntry, customerEntry, homeAddressEntry, mobileEntry, aadharEntry]
             
+            #operation frame
+            self.operationFrame = Frame(self.customerDetailsFrame, bg="red")
+            self.operationFrame.grid(row=1, column=0, columnspan=2, sticky="we")
+
+            #configuring grid area
+            self.operationFrame.rowconfigure(0, weight=1)
+            for i in range(3):
+                self.operationFrame.columnconfigure(i, weight=1)
+
             #This button allows user to interact with entries and edit them
             editButton = Button(self.customerDetailsFrame, text="Edit", state=state)
             editButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
@@ -253,30 +269,83 @@ class Profile:
             entry.config(state="normal")
         editButton.destroy()
 
-        #cancelButton to exit from edit mode and go to read mode
-        cancelButton = Button(self.customerDetailsFrame, text="Cancel", command=self.detailsFrameController)
-        cancelButton.grid(row=1, column=0, sticky="ew")
+        #opens a filedialog box to select replacement image of client
+        changePhotoButton = Button(self.operationFrame, text="change", command=self.changePhoto)
+        changePhotoButton.grid(row=0, column=0, sticky="we")
 
-        saveButton = Button(self.customerDetailsFrame, text="Save", command=self.save)
-        saveButton.grid(row=1, column=1, sticky="we")
+        #cancelButton to exit from edit mode and go to read mode
+        cancelButton = Button(self.operationFrame, text="Cancel", command=self.detailsFrameController)
+        cancelButton.grid(row=0, column=1, sticky="ew")
+
+        #saves the changes made in edit mode by user
+        saveButton = Button(self.operationFrame, text="Save", command=self.save)
+        saveButton.grid(row=0, column=2, sticky="we")
     
     #this functions saves the changes made by user in edit mode and save it to the database
     def save(self):
-        #creating a customerobject
-        customerObject = Customer()
+        #checking if the fields are filled properly
+        if((not self.customerEntryVar.get())):
+            requirementsFilled=False
+            instructionText = "Please fill Customer's Name Field"
+        elif(((not self.aadharEntryVar.get().isdigit()) or (len(self.aadharEntryVar.get())!=12))):
+            requirementsFilled=False
+            instructionText = "Please Fill Right Format of Aadhar"
+        elif((not self.mobileEntryVar.get().isdigit()) or (len(self.mobileEntryVar.get())!=10)):
+            requirementsFilled=False
+            instructionText = "Please Fill Right Format of Mobile"
+        elif((not self.fatherEntryVar.get())):
+            requirementsFilled=False
+            instructionText = "Please fill Father's Name Field"
+        elif((not self.homeAddressEntryVar.get())):
+            requirementsFilled=False
+            instructionText = "Please fill Home Address Field"
+        elif((not self.workAddressEntryVar.get())):
+            requirementsFilled=False
+            instructionText = "Please fill work address Field"
+        else:
+            requirementsFilled=True
+            instructionText = ""
 
-        #updating customer data by takin customer id as reference 
-        customerObject.updateData(id=self.data[0][0], name=self.customerEntryVar.get(), father=self.fatherEntryVar.get(), mobile=self.mobileEntryVar.get(), home_address=self.homeAddressEntryVar.get(), work_address=self.workAddressEntryVar.get(), aadhar=self.aadharEntryVar.get())
+        if(requirementsFilled):
+            #asking if user wants to really save changes
+            if(message.askyesno("Save Changes", "Do you want save the changes ?")):
+                #creating a customerobject
+                customerObject = Customer()
 
-        #updating self.data 
-        self.data = customerObject.whereData(id=self.data[0][0])
+                #updating customer data by takin customer id as reference 
+                customerObject.updateData(id=self.data[0][0], name=self.customerEntryVar.get(), father=self.fatherEntryVar.get(), mobile=self.mobileEntryVar.get(), home_address=self.homeAddressEntryVar.get(), work_address=self.workAddressEntryVar.get(), aadhar=self.aadharEntryVar.get())
 
-        #now calling detailsFrameController to show new customerDetails in readmode
-        self.detailsFrameController()
-        
-        #if self.updateStatus is not empty then updating the tabName
-        if(self.updateStatus):
-            self.updateStatus(tabName=self.customerEntryVar.get())
+                #if self.photopath is defined then copying image to the customerPhoto, it will replace the previous image with same name
+                if(self.photoPath):
+                    shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{self.data[0][0]}.jpg")
+
+                #updating self.data 
+                self.data = customerObject.whereData(id=self.data[0][0])
+
+                #now calling detailsFrameController to show new customerDetails in readmode
+                self.detailsFrameController()
+                
+                #if self.updateStatus is not empty then updating the tabName
+                if(self.updateStatus):
+                    self.updateStatus(tabName=self.customerEntryVar.get())
+        else:
+            print(instructionText)
+    
+    def changePhoto(self):
+            self.photoPath = askopenfilename(title="Select Customer's Photo", initialdir="/",filetypes=(("PNG", "*.png"),("JPG", "jpg")), multiple=False)
+            #if self.photoPath is not empty then only it will proceed
+            if(self.photoPath):
+                #creating a PIL image object
+                img=Image.open(self.photoPath)
+                #resizing the image
+                img=img.resize((82,120))
+
+                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+                self.customerPhoto = ImageTk.PhotoImage(img)
+
+                self.customerPhotoLabel.config(image=self.customerPhoto)
+            else:
+                self.photoPath= None
     
 
 #following code won't run until it is run from this file only
