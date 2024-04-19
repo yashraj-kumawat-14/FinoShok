@@ -58,7 +58,7 @@ class Model:
 
             #iterating through tempkeys to manipulate string and do some necessary concatenation before executing or inserting the data
             for key in tempKeys:
-                columns.append("`"+key+"`")
+                columns.append("`"+str(key)+"`")
             
             #join function is a string method that concatenates the elements of an iterable such as list into a single string , using a specified separator.
             columns=" ,".join(columns)
@@ -68,7 +68,7 @@ class Model:
             tempValues = list(data.values())
 
             for value in tempValues:
-                values.append("'"+value+"'")
+                values.append("'"+str(value)+"'")
             values=" ,".join(values)
 
 
