@@ -25,8 +25,7 @@ class Finoshok:
         submenu = Menu(mainMenubar, tearoff=0)
         submenu.add_command(label="Customers", command=self.customer)
         submenu.add_command(label="Add Customer", command=self.addCustomer)
-
-        submenu.add_checkbutton(label="Dummy_check")
+        
         submenu.add_command(label="Add new file", command=self.addFile)
         submenu.add_command(label="Add Credit Request", command=self.addLoanRequest)
 
@@ -165,7 +164,7 @@ class Finoshok:
         tabName = self.addTab("Add Customer", multiple=True)
 
         # adding contents of AddCustomer class to the add customer tab
-        AddCustomer(self.tabsDictionary[tabName])
+        AddCustomer(self.tabsDictionary[tabName], parentUpdateStatus=self.updateStatus)
 
     #this adds a new file tab in notebook
     def addFile(self):
@@ -192,30 +191,37 @@ class Finoshok:
         # adding contents of Customer class to the Custoemrs tab
         tempObject =Customers(self.tabsDictionary[tabName])
         #configuring function for viewCustomerButton in Customers Class
-        tempObject.viewCustomerButton.config(command=lambda customerObject=tempObject:self.viewCustomer(customerObject))
+        tempObject.viewCustomerButton.config(command=lambda customerObject=tempObject:self.viewCustomer(customerObject=customerObject))
         #now appending the tempObject to customerObjects
         self.customerObjects.append(tempObject)
 
     #this function makes a tab to show profile of particular customer
-    def viewCustomer(self, customerObject):
-        tabName = self.addTab(customerObject.customerEntryVar.get())
-        #appending the Client object into viewCustomerObjects
-        if(tabName):
-            self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus))
+    def viewCustomer(self, customerObject=None, **kwargs):
+        if(customerObject):
+            tabName = self.addTab(customerObject.customerEntryVar.get())
+            #appending the Client object into viewCustomerObjects
+            if(tabName):
+                self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus))
+        elif(kwargs["aadhar"] and kwargs["name"]):
+            tabName = self.addTab(kwargs["name"])
+            #appending the Client object into viewCustomerObjects
+            if(tabName):
+                self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], kwargs["aadhar"], updateStatus = self.updateStatus))
     
     #this functions changes status in stausbar and tabname's
     def updateStatus(self, **kwargs):
         data = kwargs
-        dataKeys = data.keys()
+        dataKeys = list(data.keys())
         if("tabName" in dataKeys):
             #getting index of current tab
             index = self.myNotebook.index("current")
             
             #changing tabName of current selectedTab
             newTabName = self.myNotebook.tab(index, text=data["tabName"])
-            
-
-
+        
+        #viewing the customer if aadhar and name is defined with it 
+        if("aadhar" in dataKeys and "name" in dataKeys):
+            self.viewCustomer(aadhar=data["aadhar"], name=data["name"])
 
 
 if __name__=="__main__":

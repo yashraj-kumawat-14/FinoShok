@@ -6,17 +6,22 @@ path.append(r"D:\projects\finoshok\finoshok\model")
 #now we can import Customer and Requests class successfully from customer model and Rewusts model respectively
 from Customer import Customer
 from Requests import Requests
+from tkinter.messagebox import showinfo
 
 #AddFile class needs a parameter either a tk window or frame
 class AddLoanRequest:
-    def __init__(self, addFileWindow):
-
+    def __init__(self, addFileWindow, parentUpdateStatus=None):
+        #assigining the parentUpdateStatus function to self.parentUpdateStatus variable
+        self.parentUpdateStatus = parentUpdateStatus
         self.data = Customer().readAllData()
         self.customerId = None
 
         #heading label of the tab
         addLoanRequestLabel = Label(addFileWindow, text="Add New loan request", font="COPPER 15", fg="yellow", bg="black")
         addLoanRequestLabel.pack(side="top", fill=X, ipady=20)
+        
+        self.instructionLabel = Label(addFileWindow, text="", font="COPPER 13", fg="red", bg="black")
+        self.instructionLabel.pack(side="top", fill="x",ipady=10)
 
         #created mainFrame which will hold everything of AddCustomer page
         mainFrameColor="black"
@@ -96,7 +101,6 @@ class AddLoanRequest:
         self.clientCombobox.grid(row=1, column=1)
 
         self.loanVar = IntVar()
-        self.loanVar.set("")
         self.loanAmtEntry = Entry(subFrame, width=23, textvariable=self.loanVar, justify="center")
         self.loanAmtEntry.grid(row=2, column=1)
 
@@ -121,16 +125,62 @@ class AddLoanRequest:
         self.purposeEntry = Entry(subFrame, textvariable=self.purposeVar, width=23, justify="center")
         self.purposeEntry.grid(row=4, column=1)
 
+        #save button allows to save credit requuset into database
         saveButton = ttk.Button(mainFrame, text="Save", command=self.save)
         saveButton.grid(row=1, column=0)
     
     #saves details in request table
     def save(self):
-        if(self.aadharVar.get() and self.loanVar.get() and self.clientVar.get() and self.dateOfRequestEntry.get() and self.customerId):
+        #checking if the fields are filled properly
+        if((not self.clientVar.get())):
+            requirementsFilled=False
+            instructionText = "Please enter existing customer aadhar \n field correctly."
+        elif((len(self.aadharVar.get())!=12) or (not self.aadharVar.get().isdigit())):
+            requirementsFilled=False
+            instructionText = "Please Fill Right Format of Aadhar"
+        elif((not self.loanVar.get()) or (not str(self.loanVar.get()).isdigit())):
+            requirementsFilled=False
+            instructionText = "Please enter correct loan amount in digits."
+        elif(not self.dateOfRequestEntry.get()):
+            requirementsFilled=False
+            instructionText = "Please enter date on which loan was requested"
+        elif(not self.purposeVar.get()):
+            requirementsFilled=False
+            instructionText = "Please enter the purpose of loan"
+        else:
+            requirementsFilled=True
+
+        #saving details only if requirementsFilled is true and self.customerId is defined
+        if(requirementsFilled and self.customerId):
+            #creating a requests object to insert data
             obj = Requests()
+            #result true means successfull insertion and false meanse unsuccessfull insertion
             result = obj.insertData(customer_id = self.customerId, requested_amount = self.loanVar.get(), purpose=self.purposeVar.get(), date = self.dateOfRequestEntry.get())
+            
+            #if result is true then show messafe that credit request added and set the values of fields to their default
             if(result):
-                print("success")
+                self.aadharVar.set("")
+                self.clientVar.set("")
+                self.loanVar.set(0)
+                self.purposeVar.set("")
+                self.instructionLabel.config(text="")
+                instructionText = f"Loan request for {self.clientVar.get()} has added successfully."
+                showinfo("Loan request added", instructionText)
+                self.updateStatus()
+            else:
+                #instruct teh user that loan request cannot be added if result is false
+                self.instructionLabel.config(text="Loan request addition unsuccessfull.", fg="red")
+
+        #if requirementfilled is false then show the instructionText
+        elif(not requirementsFilled):
+            self.instructionLabel.config(text=instructionText, fg="red")
+    
+    #updateStatus function used for letting the parentWindow get update with the changes made in this window
+    def updateStatus(self, **kwargs):
+        #running parentUpdateStatus method only if it is defined
+        if(self.parentUpdateStatus):
+            self.parentUpdateStatus()
+            
         
 if __name__=="__main__":
     root = Tk()

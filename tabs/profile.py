@@ -183,13 +183,51 @@ class Profile:
 
         self.aadharEntryVar = StringVar()
         self.aadharEntryVar.set(customerData["aadhar"])
-        aadharEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
-        aadharEntry.grid(row=1, column=1)
+        self.aadharEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
+        self.aadharEntry.grid(row=1, column=1)
+
+        #event handler for aadhar entry to restrict user from entering more than 12 digits or letters, character
+        def aadharEntryEventHandler(event):
+            tempString = ""
+            for char in self.aadharEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            if(len(tempString)>12):
+                tempString = tempString[0:12]
+                self.aadharEntry.delete(0, "end")
+                self.aadharEntry.insert("end", tempString)
+            else:
+                self.aadharEntry.delete(0, "end")
+                self.aadharEntry.insert("end", tempString)
+
+        self.aadharEntry.bind("<KeyRelease>", aadharEntryEventHandler)
 
         self.mobileEntryVar = StringVar()
         self.mobileEntryVar.set(customerData["mobile"])
-        mobileEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
-        mobileEntry.grid(row=2, column=1)
+        self.mobileEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
+        self.mobileEntry.grid(row=2, column=1)
+
+         #event handler for mobile entry to restrict user from entering more than 12 digits or letters, character
+        def mobileEntryEventHandler(event):
+            tempString = ""
+            for char in self.mobileEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            if(len(tempString)>10):
+                tempString = tempString[0:10]
+                self.mobileEntry.delete(0, "end")
+                self.mobileEntry.insert("end", tempString)
+            else:
+                self.mobileEntry.delete(0, "end")
+                self.mobileEntry.insert("end", tempString)
+
+        self.mobileEntry.bind("<KeyRelease>", mobileEntryEventHandler)
 
         self.fatherEntryVar = StringVar()
         self.fatherEntryVar.set(customerData["father"])
@@ -210,7 +248,7 @@ class Profile:
         state = ("normal")if(self.data) else ("disable")
 
         #addign sll entries inside a list
-        entryList = [workAddressEntry, fatherEntry, customerEntry, homeAddressEntry, mobileEntry, aadharEntry]
+        entryList = [workAddressEntry, fatherEntry, customerEntry, homeAddressEntry, self.mobileEntry, self.aadharEntry]
             
         #operation frame
         self.operationFrame = Frame(self.customerDetailsFrame, bg="red")
@@ -299,7 +337,7 @@ class Profile:
                 if(self.updateStatus):
                     self.updateStatus(tabName=self.customerEntryVar.get())
         else:
-            print(instructionText)
+            message.showerror("Error", instructionText)
     
     def changePhoto(self):
             self.photoPath = askopenfilename(title="Select Customer's Photo", initialdir="/",filetypes=(("PNG", "*.png"),("JPG", "jpg")), multiple=False)

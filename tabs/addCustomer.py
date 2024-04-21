@@ -6,12 +6,16 @@ from pathConfig import CUSTOMERPHOTOPATH
 from Customer import Customer
 from tkinter import Tk, Frame, Label, Entry, Button, Checkbutton, IntVar, END
 from tkinter.filedialog import askopenfilename
+from tkinter.messagebox import showinfo
 from PIL import Image, ImageTk
 import shutil
 
 #AddCustomer class needs a parameter either a tk window or frame
 class AddCustomer:
-    def __init__(self, addCustomerWindow):
+    def __init__(self, addCustomerWindow, parentUpdateStatus=None):
+        #parnetupdatestatus
+        self.parentUpdateStatus = parentUpdateStatus
+
         #initial state of customerphoto  and self.photopath is set to None
         self.customerPhoto = None
         self.photoPath = None
@@ -69,11 +73,49 @@ class AddCustomer:
         cNameEntry = Entry(subFrame, width=14)
         cNameEntry.grid(row=0, column=1)
 
-        aadharEntry = Entry(subFrame, width=14)
-        aadharEntry.grid(row=1, column=1)
+        self.aadharEntry = Entry(subFrame, width=14)
+        self.aadharEntry.grid(row=1, column=1)
 
-        mobileEntry = Entry(subFrame, width=14)
-        mobileEntry.grid(row=2, column=1)
+        #event handler for aadhar entry to restrict user from entering more than 12 digits or letters, character
+        def aadharEntryEventHandler(event):
+            tempString = ""
+            for char in self.aadharEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            if(len(tempString)>12):
+                tempString = tempString[0:12]
+                self.aadharEntry.delete(0, "end")
+                self.aadharEntry.insert("end", tempString)
+            else:
+                self.aadharEntry.delete(0, "end")
+                self.aadharEntry.insert("end", tempString)
+
+        self.aadharEntry.bind("<KeyRelease>", aadharEntryEventHandler)
+
+        self.mobileEntry = Entry(subFrame, width=14)
+        self.mobileEntry.grid(row=2, column=1)
+
+        #event handler for mobile entry to restrict user from entering more than 12 digits or letters, character
+        def mobileEntryEventHandler(event):
+            tempString = ""
+            for char in self.mobileEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            if(len(tempString)>10):
+                tempString = tempString[0:10]
+                self.mobileEntry.delete(0, "end")
+                self.mobileEntry.insert("end", tempString)
+            else:
+                self.mobileEntry.delete(0, "end")
+                self.mobileEntry.insert("end", tempString)
+
+        self.mobileEntry.bind("<KeyRelease>", mobileEntryEventHandler)
 
         fNameEntry = Entry(subFrame, width=14)
         fNameEntry.grid(row=3, column=1)
@@ -115,7 +157,7 @@ class AddCustomer:
                     entry.config(width=maxLength+10)
 
         #creating entryList variable containing all entry widgets whom we wnat to enable dynamic width
-        entryList = [cNameEntry, aadharEntry, mobileEntry, fNameEntry, hAddressEntry, wAddressEntry]
+        entryList = [cNameEntry, self.aadharEntry, self.mobileEntry, fNameEntry, hAddressEntry, wAddressEntry]
 
         #traversing through all entry widgets present in entryList
         for entry in entryList:
@@ -156,10 +198,10 @@ class AddCustomer:
             if((not cNameEntry.get())):
                 requirementsFilled=False
                 instructionText = "Please fill Customer's Name Field"
-            elif(((not aadharEntry.get().isdigit()) or (len(aadharEntry.get())!=12))):
+            elif(((not self.aadharEntry.get().isdigit()) or (len(self.aadharEntry.get())!=12))):
                 requirementsFilled=False
                 instructionText = "Please Fill Right Format of Aadhar"
-            elif((not mobileEntry.get().isdigit()) or (len(mobileEntry.get())!=10)):
+            elif((not self.mobileEntry.get().isdigit()) or (len(self.mobileEntry.get())!=10)):
                 requirementsFilled=False
                 instructionText = "Please Fill Right Format of Mobile"
             elif((not fNameEntry.get())):
@@ -177,7 +219,7 @@ class AddCustomer:
             if(requirementsFilled):
                 #check if customer already exists on the basis of its aadhar
                 customerObject = Customer()
-                data = customerObject.whereData(aadhar = aadharEntry.get())
+                data = customerObject.whereData(aadhar = self.aadharEntry.get())
                 if(not data):
                     alreadyExists = False
                 else:
@@ -186,19 +228,21 @@ class AddCustomer:
                 if(not alreadyExists):
                     #code for saving the customer
                     #insertSuccessfully true if successfull insertion else false
-                    insertSuccessfully= (customerObject.insertData(name=cNameEntry.get(), father=fNameEntry.get(), mobile=mobileEntry.get(), aadhar =aadharEntry.get(), home_address=hAddressEntry.get(), work_address=wAddressEntry.get()))
+                    insertSuccessfully= (customerObject.insertData(name=cNameEntry.get(), father=fNameEntry.get(), mobile=self.mobileEntry.get(), aadhar =self.aadharEntry.get(), home_address=hAddressEntry.get(), work_address=wAddressEntry.get()))
 
                     #if customer data inserted succesfully then only proceed
                     if(insertSuccessfully):
                         #adding customer's photo to assets if photoPath exists
                         if(self.photoPath):
                             #saving image as customerId.jpg
-                            customerId = customerObject.whereData(aadhar=aadharEntry.get())[0][0]
+                            customerId = customerObject.whereData(aadhar=self.aadharEntry.get())[0][0]
                             shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{customerId}.jpg")
 
                         #instructing user that all things are carried out successfully
-                        instructionText="Customer added to database successfully"
-                        instructionLabel.config(text=instructionText, fg="green")
+                        instructionText=f"{cNameEntry.get()} added to database successfully"
+                        showinfo("Customer Added", instructionText)
+                        self.parentUpdateStatus(name=cNameEntry.get(), aadhar=self.aadharEntry.get())
+                        instructionLabel.config(text="")
 
                         #removing old data from all entries
                         for entry in entryList:
@@ -229,6 +273,9 @@ class AddCustomer:
         checkAndSaveButton = Button(mainFrame, text="Check And Save", command=checkAndSave)
         checkAndSaveButton.grid(row=1, column=0)
 
+    def updateStatus(self, **kwargs):
+        if(self.parentUpdateStatus):
+            self.parentUpdateStatus(name="yhj", aadhar="785337610582")    
 if __name__=="__main__":
     root = Tk()
     root.geometry("599x499")
