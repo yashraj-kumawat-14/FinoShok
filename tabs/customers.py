@@ -6,6 +6,7 @@ from sys import path
 path.append(r"D:\projects\finoshok\finoshok\model")
 #now we can import Customer class successfully from customer model
 from Customer import Customer
+from tkinter import ttk
 
 #this is customer class which creates a object for searching customers and getting their information
 class Customers:
@@ -57,9 +58,19 @@ class Customers:
         #work of customerListFrame starts here
         
         #creating a listbox
-        self.customerListBox = Listbox(customerListFrame, selectmode="browse")
+        self.customerListBox = ttk.Treeview(customerListFrame, selectmode="browse")
         self.customerListBox.pack(fill="both", expand=True)
 
+        self.customerListBox["columns"] = ("name", "mobile", "aadhar")
+        self.customerListBox.column("#0", width=50, anchor="center", stretch=False)
+        self.customerListBox.column("name", width=100, minwidth=50, anchor="center")
+        self.customerListBox.column("mobile", width=100, minwidth=50, anchor="center")
+        self.customerListBox.column("aadhar", width=100, minwidth=50,  anchor="center")
+        self.customerListBox.heading("name", text="Customer Name", anchor="center")
+        self.customerListBox.heading("mobile", text="Mobile", anchor="center")
+        self.customerListBox.heading("aadhar", text="Aadhar", anchor="center")
+        self.customerListBox.heading("#0", text="S.no.", anchor="center")
+        self.customerListBox.bind("<<TreeviewSelect>>", self.dynamicDetails)
         # creating scrollbar for y direction
         scrollY = Scrollbar(self.customerListBox, command=self.customerListBox.yview)
         scrollY.pack(side="right", fill="y")
@@ -70,8 +81,8 @@ class Customers:
         scrollX.pack(side="bottom", fill="x")
         self.customerListBox.config(xscrollcommand=scrollX.set)
 
-        #getting data from database
-        data = Customer().readAllData()
+        # #getting data from database
+        # data = Customer().readAllData()
 
         #creating an empty list initailly which will store dictionary containing individual customer data
         self.dataList = []
@@ -79,13 +90,8 @@ class Customers:
         #creating temporary datalist
         self.tempDataList = []
 
-        #inserting data initially into listbox
-        for customer in data:
-            self.dataList.append({"id":customer[0], "name":customer[1], "mobile": customer[3], "aadhar":customer[6], "father":customer[2], "home_address":customer[4], "work_address":customer[5]})
-
         #binding enty and listbox to their respective fucntions
         self.searchEntry.bind("<KeyRelease>", self.search)        #Keyrelease because event actually fires  before entry wicget insert texts.
-        self.customerListBox.bind("<<ListboxSelect>>", self.dynamicDetails)
 
         #work of customerListFrame ends here
             
@@ -157,8 +163,9 @@ class Customers:
         self.viewCustomerButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
 
         #initially invoking search funtion
-        self.search(None)
+        self.refresh()
         self.customerListBox.selection_set(0)
+        self.customerListBox.focus(0)
         self.dynamicDetails(None)
     
     #it will display data in listbox according to the search query
@@ -169,34 +176,40 @@ class Customers:
             self.tempDataList = []
 
             for customer in self.dataList:
-                if(searchText in str(customer["aadhar"]) or searchText in customer["name"] or searchText in str(customer["mobile"])):
+                if(searchText.lower() in str(customer["aadhar"]).lower() or searchText.lower() in customer["name"].lower() or searchText.lower() in str(customer["mobile"]).lower()):
                     self.tempDataList.append(customer)
-
-            self.customerListBox.delete(0, END)
+            iids = self.customerListBox.get_children()
+            for iid in iids:
+                self.customerListBox.delete(iid)
+            count=0
             for customer in self.tempDataList:
-                self.customerListBox.insert(END, f"Name {customer["name"]} | Mobile :{customer["mobile"]} | Aadhar : {customer["aadhar"]}")
+                self.customerListBox.insert(parent="", text=count, index="end", iid=count, values=(customer["name"], customer["mobile"], customer["aadhar"]))
+                count+=1
         else:
-            #clearing all the previous data in listbox and tempDataList and reinserting all the data
-            self.customerListBox.delete(0, END)
-
+            iids = self.customerListBox.get_children()
+            for iid in iids:
+                self.customerListBox.delete(iid)
+            count=0
             for customer in self.dataList:
-                self.customerListBox.insert(END, f"Name {customer["name"]} | Mobile :{customer["mobile"]} | Aadhar : {customer["aadhar"]}")
-                self.tempDataList.append({"id":customer["id"],"name":customer["name"], "mobile": customer["mobile"], "aadhar":customer["aadhar"]})
-            
+                self.customerListBox.insert(parent="", text=count, index="end", iid=count, values=(customer["name"], customer["mobile"], customer["aadhar"]))
+                count+=1
+            self.tempDataList = self.dataList
+
     #this function dynamically changes details in detailframe according to the currentselection in customerlistbox
     def dynamicDetails(self, event):
-        if(self.customerListBox.curselection()):
+        if(self.customerListBox.focus()):
             #dynamic updating details and photo
 
             #setting new data
-            self.customerEntryVar.set(f"{self.tempDataList[self.customerListBox.curselection()[0]]["name"]}")
-            self.mobileEntryVar.set(f"{self.tempDataList[self.customerListBox.curselection()[0]]["mobile"]}")
-            self.aadharEntryVar.set(f"{self.tempDataList[self.customerListBox.curselection()[0]]["aadhar"]}")
+            values = self.customerListBox.item(self.customerListBox.focus(), "values")
+            self.customerEntryVar.set(values[0])
+            self.mobileEntryVar.set(values[1])
+            self.aadharEntryVar.set(values[2])
 
             #creating a PIL image object
-            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.tempDataList[self.customerListBox.curselection()[0]]["id"]}.jpg"
-            
-            #if error found during imaging loading then use default image
+            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.tempDataList[int(self.customerListBox.item(self.customerListBox.focus(), "text"))]["id"]}.jpg"
+
+            # if error found during imaging loading then use default image
             try:
                 img=Image.open(PhotoPath)
             
@@ -230,7 +243,8 @@ class Customers:
         #inserting data initially into listbox
         for customer in data:
             self.dataList.append({"id":customer[0],"name":customer[1], "mobile": customer[3], "aadhar":customer[6]})
-        
+
+        self.searchEntry.delete(0, 'end')
         self.search(None)
         self.customerListBox.selection_set(0)
         self.dynamicDetails(None)

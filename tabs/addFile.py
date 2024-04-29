@@ -51,19 +51,26 @@ class AddFile:
         #now creating 3 sections : 
 
         #section 1 for selecting any one loan requests also adding heading/label
-        headingFrame = Frame(subFrame1)
-        headingFrame.pack(fill="x")
+        self.searchFrame = Frame(subFrame1)
+        self.searchFrame.pack(side="top", fill="x")
 
-        for i in range(5):
-            headingFrame.columnconfigure(i, weight=1)
+        #work of searchFrame starts here
+        self.searchFrame.columnconfigure(2, weight=1)
 
-        #heading
-        selectRequestLabel = Label(headingFrame, text="Select Loan Request ")
-        selectRequestLabel.grid(row=0, column=0, columnspan=4)
+        self.searchLabel = Label(self.searchFrame, text="Search here : ")
+        self.searchLabel.grid(row=0, column=0)
 
-        #refresh button to get latest requests in database
-        refreshButton = Button(headingFrame, text=u"\u21BB", bg="orange", font="COPPER 12", height=1, width=3, command=self.refresh)
-        refreshButton.grid(row=0, column=4, sticky="e")
+        self.searchEntry = Entry(self.searchFrame)
+        self.searchEntry.grid(row=0, column=1)
+        #binding enty and listbox to their respective fucntions
+        self.searchEntry.bind("<KeyRelease>", self.search)        #Keyrelease because event actually fires  before entry wicget insert texts.
+
+        self.refreshButton = Button(self.searchFrame, text=u"\u21BB", bg="orange", font="COPPER 12", height=1, width=3, command=self.refresh)
+        self.refreshButton.grid(row=0, column=2, sticky="e")
+
+        # creating scrollbar for y direction
+        scrollY = Scrollbar(subFrame1)
+        scrollY.pack(side="right", fill="y")
 
         self.section1 = Frame(subFrame1)
         self.section1.pack(fill="both", expand=True) 
@@ -86,30 +93,34 @@ class AddFile:
         self.section1.rowconfigure(0, weight=1)
         self.section1.columnconfigure(0, weight=1)
         
-        self.customerRequestBox = Listbox(self.section1)
+        self.customerRequestBox = ttk.Treeview(self.section1)
         self.customerRequestBox.grid(row=0, column=0, sticky="nsew")
-        self.customerRequestBox.bind("<<ListboxSelect>>", self.dynamicDetails)
+        self.customerRequestBox.bind("<<TreeviewSelect>>", self.dynamicDetails)
 
-        # creating scrollbar for y direction
-        scrollY = Scrollbar(self.customerRequestBox, command=self.customerRequestBox.yview)
-        scrollY.pack(side="right", fill="y")
+        self.customerRequestBox["columns"] = ("name", "mobile", "aadhar", "amount", "date")
+        self.customerRequestBox.column('#0', width=50, anchor="center", stretch=False)
+        self.customerRequestBox.column('name', width=100, minwidth=50, anchor="center")
+        self.customerRequestBox.column('mobile', width=100, minwidth=50, anchor="center")
+        self.customerRequestBox.column('aadhar', width=100, minwidth=50, anchor="center")
+        self.customerRequestBox.column('amount', width=100, minwidth=50, anchor="center")
+        self.customerRequestBox.column('date', width=100, minwidth=50, anchor="center")
+        self.customerRequestBox.heading("name", text="Customer Name", anchor="center")
+        self.customerRequestBox.heading("mobile", text="Mobile", anchor="center")
+        self.customerRequestBox.heading("aadhar", text="Aadhar", anchor="center")
+        self.customerRequestBox.heading("amount", text="Amount", anchor="center")
+        self.customerRequestBox.heading("date", text="Date", anchor="center")
+        self.customerRequestBox.heading("#0", text="S.no.", anchor="center")
+
+        scrollY.config(command=self.customerRequestBox.yview)
         self.customerRequestBox.config(yscrollcommand=scrollY.set)
 
         #creating scrollbar for x dirextion
-        scrollX = Scrollbar(self.customerRequestBox, command=self.customerRequestBox.xview, orient="horizontal")
+        scrollX = Scrollbar(subFrame1, command=self.customerRequestBox.xview, orient="horizontal")
         scrollX.pack(side="bottom", fill="x")
         self.customerRequestBox.config(xscrollcommand=scrollX.set)
         
-        requestsData = Requests().readAllData()
-        customerObject = Customer()
         self.dataList = []
-
-        for request in requestsData:
-            tempCustomerData = customerObject.whereData(id=request[1])
-
-            self.dataList.append({"customerId":tempCustomerData[0][0], "aadhar":tempCustomerData[0][6], "name":tempCustomerData[0][1], "father":tempCustomerData[0][2], "mobile":tempCustomerData[0][3], "homeAddress":tempCustomerData[0][4], "workAddress": tempCustomerData[0][5], "status":request[5], "purpose":request[3]})
-
-            self.customerRequestBox.insert(END, f"customer Id : {tempCustomerData[0][0]} | name {tempCustomerData[0][1]} | amount : {request[2]} | date : {request[4]} | mobile : {tempCustomerData[0][3]} | aadhar : {tempCustomerData[0][6]}   ")
+        self.tempDataList = []
 
         #section 1 work ends----
         
@@ -230,16 +241,45 @@ class AddFile:
         self.purposeEntry.grid(row=1, column=1)
         #self.section3 workd ends----
 
-        #initaila starting 
-        self.customerRequestBox.selection_set('active')
+        #initially invoking search funtion
+        self.refresh()
+        self.customerRequestBox.selection_set(0)
+        self.customerRequestBox.focus(0)
         self.dynamicDetails(None)
+    #it will display data in listbox according to the search query
+    
+    def search(self, event):
+        if(self.searchEntry.get()):
+            #search according to aadhar, mobile, name
+            searchText = self.searchEntry.get()
+            self.tempDataList = []
 
+            for customer in self.dataList:
+                if(searchText.lower() in str(customer["aadhar"]).lower() or searchText.lower() in customer["name"].lower() or searchText.lower() in str(customer["mobile"]).lower()):
+                    self.tempDataList.append(customer)
+            iids = self.customerRequestBox.get_children()
+            for iid in iids:
+                self.customerRequestBox.delete(iid)
+            count=0
+            for customer in self.tempDataList:
+                self.customerRequestBox.insert(parent="", text=count, index="end", iid=count, values=(customer["name"], customer["mobile"], customer["aadhar"], customer["amountRequested"], customer["dateRequested"]))
+                count+=1
+        else:
+            iids = self.customerRequestBox.get_children()
+            for iid in iids:
+                self.customerRequestBox.delete(iid)
+            count=0
+            for customer in self.dataList:
+                self.customerRequestBox.insert(parent="", text=count, index="end", iid=count, values=(customer["name"], customer["mobile"], customer["aadhar"], customer["amountRequested"], customer["dateRequested"]))
+                count+=1
+            self.tempDataList = self.dataList
+    
     def dynamicDetails(self, event):
         #checking if there is selected item currnently and the status of that item is 1 i.e active
-        if(self.customerRequestBox.curselection() and self.dataList[self.customerRequestBox.curselection()[0]]["status"]==1):
+        if(self.customerRequestBox.focus() and self.dataList[int(self.customerRequestBox.focus())]["status"]==1):
             #trying to show photo of customer
             try:
-                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.dataList[self.customerRequestBox.curselection()[0]]["customerId"]}.jpg"
+                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.dataList[int(self.customerRequestBox.focus())]["customerId"]}.jpg"
                 img=Image.open(self.photoPath)
                 
                 #resizing the image
@@ -260,17 +300,18 @@ class AddFile:
                 self.customerPhotoLabel.config(image=self.customerPhoto)
 
             #settign the values of entries in details frame
-            self.customerEntryVar.set(self.dataList[self.customerRequestBox.curselection()[0]]["name"])
-            self.aadharEntryVar.set(self.dataList[self.customerRequestBox.curselection()[0]]["aadhar"])
-            self.mobileEntryVar.set(self.dataList[self.customerRequestBox.curselection()[0]]["mobile"])
-            self.fatherEntryVar.set(self.dataList[self.customerRequestBox.curselection()[0]]["father"])
-            self.homeAddressEntryVar.set(self.dataList[self.customerRequestBox.curselection()[0]]["homeAddress"])
-            self.workAddressEntryVar.set(self.dataList[self.customerRequestBox.curselection()[0]]["workAddress"])
+                
+            self.customerEntryVar.set(self.dataList[int(self.customerRequestBox.focus())]["name"])
+            self.aadharEntryVar.set(self.dataList[int(self.customerRequestBox.focus())]["aadhar"])
+            self.mobileEntryVar.set(self.dataList[int(self.customerRequestBox.focus())]["mobile"])
+            self.fatherEntryVar.set(self.dataList[int(self.customerRequestBox.focus())]["father"])
+            self.homeAddressEntryVar.set(self.dataList[int(self.customerRequestBox.focus())]["homeAddress"])
+            self.workAddressEntryVar.set(self.dataList[int(self.customerRequestBox.focus())]["workAddress"])
             self.purposeEntry.config(state="normal")
             
             #deleting all the data from textbox of purpose entry and then reinserting the new value of purpose
             self.purposeEntry.delete("1.0", END)
-            self.purposeEntry.insert(END, self.dataList[self.customerRequestBox.curselection()[0]]["purpose"])
+            self.purposeEntry.insert(END, self.dataList[int(self.customerRequestBox.focus())]["purpose"])
             self.purposeEntry.config(state="disable")
             
             #performing cancel method
@@ -284,16 +325,18 @@ class AddFile:
         customerObject = Customer()
         self.dataList = []
 
-        #deleting all items from listbox
-        self.customerRequestBox.delete(0, END)
-
         #updating self.datalist and self.customerRequestBox
         for request in requestsData:
             tempCustomerData = customerObject.whereData(id=request[1])
 
-            self.dataList.append({"customerId":tempCustomerData[0][0], "aadhar":tempCustomerData[0][6], "name":tempCustomerData[0][1], "father":tempCustomerData[0][2], "mobile":tempCustomerData[0][3], "homeAddress":tempCustomerData[0][4], "workAddress": tempCustomerData[0][5], "status":request[5], "purpose":request[3]})
+            self.dataList.append({"customerId":tempCustomerData[0][0], "aadhar":tempCustomerData[0][6], "name":tempCustomerData[0][1], "father":tempCustomerData[0][2], "mobile":tempCustomerData[0][3], "homeAddress":tempCustomerData[0][4], "workAddress": tempCustomerData[0][5], "status":request[5], "purpose":request[3], "amountRequested": request[2], "dateRequested":request[4]})
 
-            self.customerRequestBox.insert(END, f"customer Id : {tempCustomerData[0][0]} | name {tempCustomerData[0][1]} | amount : {request[2]} | date : {request[4]} | mobile : {tempCustomerData[0][3]} | aadhar : {tempCustomerData[0][6]}   ")
+        self.searchEntry.delete(0, "end")
+        self.search(None)
+        self.customerRequestBox.selection_set(0)
+        self.customerRequestBox.focus(0)
+        self.dynamicDetails(None)
+
         
         #now restarting the dynamic details 
         self.customerRequestBox.selection_set(0)
@@ -309,10 +352,10 @@ class AddFile:
         
     
     def updateStatus(self):
-        if(self.pagesList[0].loanCheckVar.get()==1):
-            self.customerRequestBox.config(state="disable")
-        else:
-            self.customerRequestBox.config(state="normal")
+        # if(self.pagesList[0].loanCheckVar.get()==1):
+        #     self.customerRequestBox.config(state="disable")
+        # else:
+        #     self.customerRequestBox.config(state="normal")
         
         if(self.pagesList[0].ok==True):
             if(self.pagesList[0].guarranterCheckVar.get()==1):
