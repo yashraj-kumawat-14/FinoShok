@@ -247,6 +247,7 @@ class Customers:
         self.searchEntry.delete(0, 'end')
         self.search(None)
         self.customerListBox.selection_set(0)
+        self.customerListBox.focus(0)
         self.dynamicDetails(None)
 
 

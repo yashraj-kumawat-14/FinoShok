@@ -18,40 +18,36 @@ from Requests import Requests
 class AddFile:
     def __init__(self, addFileWindow):
         #create mainframe containing everything
-        mainFrame = Frame(addFileWindow)
-        mainFrame.pack(fill="both", expand=True)
+        self.mainFrame = Frame(addFileWindow)
+        self.mainFrame.pack(fill="both", expand=True)
 
         #columnconfigure() resizes the grid vertically, while rowconfigure() resizes the grid horizontally. The width of a grid column is equal to the width of its widest cell.
 
-        mainFrame.rowconfigure(0, weight=1)
-        mainFrame.rowconfigure(1, weight=1)
-        mainFrame.columnconfigure(0, weight=1)
-        mainFrame.columnconfigure(1, weight=1)
+        self.mainFrame.rowconfigure(0, weight=1)
+        self.mainFrame.rowconfigure(1, weight=1)
+        self.mainFrame.columnconfigure(0, weight=1)
+        self.mainFrame.columnconfigure(1, weight=1)
         
         #created subframes
         
         #The sticky parameter in the .grid() method of Tkinter is used to define how a widget should expand to fill the space allocated to it within a grid cell.
 
-        subFrame1 = Frame(mainFrame, relief="groove", border=3)
-        subFrame1.grid(row=0, column=0, sticky="ewns")
-        subFrame1.pack_propagate(False)
+        self.subFrame1 = Frame(self.mainFrame, relief="groove", border=3)
+        self.subFrame1.grid(row=0, column=0, sticky="ewns")
+        self.subFrame1.pack_propagate(False)
 
-        subFrame2 = Frame(mainFrame, relief="groove", border=3)
-        subFrame2.grid(row=0, column=1, sticky="ewns", rowspan=2)
-        subFrame2.pack_propagate(False)
-        #creating a subframe2 as more responsive  using rowconfigure and columnconfigure
+        self.subFrame2 = Frame(self.mainFrame, relief="groove", border=3)
+        self.subFrame2.grid(row=0, column=1, sticky="ewns", rowspan=2)
+        self.subFrame2.pack_propagate(False)
 
-        subFrame2.rowconfigure(0, weight=1)
-        subFrame2.columnconfigure(0, weight=1)
-
-        subFrame3 = Frame(mainFrame, relief="groove", border=3)
-        subFrame3.grid(row=1, column=0, sticky="ewns")  
-        subFrame3.pack_propagate(False)
+        self.subFrame3 = Frame(self.mainFrame, relief="groove", border=3)
+        self.subFrame3.grid(row=1, column=0, sticky="ewns")  
+        self.subFrame3.pack_propagate(False)
 
         #now creating 3 sections : 
 
         #section 1 for selecting any one loan requests also adding heading/label
-        self.searchFrame = Frame(subFrame1)
+        self.searchFrame = Frame(self.subFrame1)
         self.searchFrame.pack(side="top", fill="x")
 
         #work of searchFrame starts here
@@ -69,19 +65,19 @@ class AddFile:
         self.refreshButton.grid(row=0, column=2, sticky="e")
 
         # creating scrollbar for y direction
-        scrollY = Scrollbar(subFrame1)
-        scrollY.pack(side="right", fill="y")
+        self.scrollY = Scrollbar(self.subFrame1)
+        self.scrollY.pack(side="right", fill="y")
 
-        self.section1 = Frame(subFrame1)
+        self.section1 = Frame(self.subFrame1)
         self.section1.pack(fill="both", expand=True) 
 
         #section 2 for loan confirmation along with some formalities
-        self.section2 = Frame(subFrame2)
+        self.section2 = Frame(self.subFrame2)
         self.section2.pack(fill="both", expand=True)
 
         #section 3 for showing selected loan request details along with some customer details
 
-        self.section3 = Frame(subFrame3)
+        self.section3 = Frame(self.subFrame3)
         self.section3.pack(fill="both", expand=True) 
 
         #now filling in these sections
@@ -111,13 +107,13 @@ class AddFile:
         self.customerRequestBox.heading("date", text="Date", anchor="center")
         self.customerRequestBox.heading("#0", text="S.no.", anchor="center")
 
-        scrollY.config(command=self.customerRequestBox.yview)
-        self.customerRequestBox.config(yscrollcommand=scrollY.set)
+        self.scrollY.config(command=self.customerRequestBox.yview)
+        self.customerRequestBox.config(yscrollcommand=self.scrollY.set)
 
         #creating scrollbar for x dirextion
-        scrollX = Scrollbar(subFrame1, command=self.customerRequestBox.xview, orient="horizontal")
-        scrollX.pack(side="bottom", fill="x")
-        self.customerRequestBox.config(xscrollcommand=scrollX.set)
+        self.scrollX = Scrollbar(self.subFrame1, command=self.customerRequestBox.xview, orient="horizontal")
+        self.scrollX.pack(side="bottom", fill="x")
+        self.customerRequestBox.config(xscrollcommand=self.scrollX.set)
         
         self.dataList = []
         self.tempDataList = []
@@ -131,21 +127,21 @@ class AddFile:
         self.pagesList = [ApprovalPage(self.section2, parentUpdateStatus=self.updateStatus), GuarrantersPage(self.section2, parentUpdateStatus=self.updateStatus), VehiclesPage(self.section2, parentUpdateStatus=self.updateStatus), DocVerifyPage(self.section2, parentUpdateStatus=self.updateStatus), finalPage(self.section2, parentUpdateStatus=self.updateStatus)]
 
         self.changePage(0)
-        operationFrame = Frame(subFrame2)
-        operationFrame.pack(side="bottom", fill="x")
+        self.operationFrame = Frame(self.subFrame2)
+        self.operationFrame.pack(side="bottom", fill="x")
 
-        operationFrame.rowconfigure(0, weight=1)
-        operationFrame.columnconfigure(0, weight=1)
-        operationFrame.columnconfigure(1, weight=1)
-        operationFrame.columnconfigure(2, weight=1)
+        self.operationFrame.rowconfigure(0, weight=1)
+        self.operationFrame.columnconfigure(0, weight=1)
+        self.operationFrame.columnconfigure(1, weight=1)
+        self.operationFrame.columnconfigure(2, weight=1)
 
-        self.cancelButton = Button(operationFrame, text="Cancel", command=self.cancelMethod)
+        self.cancelButton = Button(self.operationFrame, text="Cancel", command=self.cancelMethod)
         self.cancelButton.grid(row=0, column=0, sticky="ew")
 
-        self.backButton = Button(operationFrame, text="Back", command=self.backPage)
+        self.backButton = Button(self.operationFrame, text="Back", command=self.backPage)
         self.backButton.grid(row=0, column=1, sticky="ew")
 
-        self.nextButton = Button(operationFrame, text="Next", bg="orange", command=self.nextPage)
+        self.nextButton = Button(self.operationFrame, text="Next", bg="orange", command=self.nextPage)
         self.nextButton.grid(row=0, column=2, sticky="we")
 
         #section 2 work endss ----
@@ -159,83 +155,83 @@ class AddFile:
         self.customerDetailsFrame.grid(row=0, column=0)
                 
         #creating two frames PhotoFrame and Details inside self.customerDetailsFrame
-        PhotoFrame = Frame(self.customerDetailsFrame, relief="groove", border=3)
-        PhotoFrame.grid(row=0, column=0, sticky="nsew")
+        self.PhotoFrame = Frame(self.customerDetailsFrame, relief="groove", border=3)
+        self.PhotoFrame.grid(row=0, column=0, sticky="nsew")
 
-        Details = Frame(self.customerDetailsFrame, relief="groove", border=3)
-        Details.grid(row=0, column=1, sticky="nsew")
+        self.Details = Frame(self.customerDetailsFrame, relief="groove", border=3)
+        self.Details.grid(row=0, column=1, sticky="nsew")
 
         #creating responsive PhotoFrame
-        PhotoFrame.rowconfigure(0, weight=1)
-        PhotoFrame.columnconfigure(0, weight=1)
+        self.PhotoFrame.rowconfigure(0, weight=1)
+        self.PhotoFrame.columnconfigure(0, weight=1)
 
         #creating a PIL image object
             
         #if error found during imaging loading then use default image
         #now integrating the image into label widget and positioning it via grid 
-        self.customerPhotoLabel = Label(PhotoFrame)
+        self.customerPhotoLabel = Label(self.PhotoFrame)
         self.customerPhotoLabel.grid(row=0, column=0)
         
         #creating responsive sec3Details frame
-        Details.rowconfigure(0, weight=1)
-        Details.columnconfigure(0, weight=1)
+        self.Details.rowconfigure(0, weight=1)
+        self.Details.columnconfigure(0, weight=1)
             
         #creating a inner subFramee detailsInnerFrame inside sec3details
-        detailsInnerFrame = Frame(Details)
-        detailsInnerFrame.grid(row=0, column=0)
+        self.detailsInnerFrame = Frame(self.Details)
+        self.detailsInnerFrame.grid(row=0, column=0)
 
         #creating labels static
-        customerNameLabel = Label(detailsInnerFrame, text="Name : ")
-        customerNameLabel.grid(row=0, column=0)
+        self.customerNameLabel = Label(self.detailsInnerFrame, text="Name : ")
+        self.customerNameLabel.grid(row=0, column=0)
 
-        aadharLabel = Label(detailsInnerFrame, text="Aadhar : ")
-        aadharLabel.grid(row=1, column=0)
+        self.aadharLabel = Label(self.detailsInnerFrame, text="Aadhar : ")
+        self.aadharLabel.grid(row=1, column=0)
 
-        mobileLabel = Label(detailsInnerFrame, text="Mobile : ")
-        mobileLabel.grid(row=2, column=0)
+        self.mobileLabel = Label(self.detailsInnerFrame, text="Mobile : ")
+        self.mobileLabel.grid(row=2, column=0)
 
-        fatherLabel = Label(detailsInnerFrame, text="Father : ")
-        fatherLabel.grid(row=3, column=0)
+        self.fatherLabel = Label(self.detailsInnerFrame, text="Father : ")
+        self.fatherLabel.grid(row=3, column=0)
 
-        homeAddressLabel = Label(detailsInnerFrame, text="Home Address : ")
-        homeAddressLabel.grid(row=4, column=0)
+        self.homeAddressLabel = Label(self.detailsInnerFrame, text="Home Address : ")
+        self.homeAddressLabel.grid(row=4, column=0)
 
-        workAddressLabel = Label(detailsInnerFrame, text="Work Address : ")
-        workAddressLabel.grid(row=5, column=0)
+        self.workAddressLabel = Label(self.detailsInnerFrame, text="Work Address : ")
+        self.workAddressLabel.grid(row=5, column=0)
 
-        purposeLabel = Label(self.customerDetailsFrame, text="Purpose of Loan : ")
-        purposeLabel.grid(row=1, column=0)
+        self.purposeLabel = Label(self.customerDetailsFrame, text="Purpose of Loan : ")
+        self.purposeLabel.grid(row=1, column=0)
 
         #creating labels dynamic
         self.customerEntryVar = StringVar()
         self.customerEntryVar.set("name")
-        customerEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.customerEntryVar)
-        customerEntry.grid(row=0, column=1)
+        self.customerEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.customerEntryVar)
+        self.customerEntry.grid(row=0, column=1)
 
         self.aadharEntryVar = StringVar()
         self.aadharEntryVar.set("aadhar")
-        aadharEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
-        aadharEntry.grid(row=1, column=1)
+        self.aadharEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
+        self.aadharEntry.grid(row=1, column=1)
 
         self.mobileEntryVar = StringVar()
         self.mobileEntryVar.set("mobile")
-        mobileEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
-        mobileEntry.grid(row=2, column=1)
+        self.mobileEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
+        self.mobileEntry.grid(row=2, column=1)
 
         self.fatherEntryVar = StringVar()
         self.fatherEntryVar.set("father")
-        fatherEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.fatherEntryVar)
-        fatherEntry.grid(row=3, column=1)
+        self.fatherEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.fatherEntryVar)
+        self.fatherEntry.grid(row=3, column=1)
 
         self.homeAddressEntryVar = StringVar()
         self.homeAddressEntryVar.set("homeAddress")
-        homeAddressEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.homeAddressEntryVar)
-        homeAddressEntry.grid(row=4, column=1)
+        self.homeAddressEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.homeAddressEntryVar)
+        self.homeAddressEntry.grid(row=4, column=1)
 
         self.workAddressEntryVar = StringVar()
         self.workAddressEntryVar.set("workAddress")
-        workAddressEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.workAddressEntryVar)
-        workAddressEntry.grid(row=5, column=1)
+        self.workAddressEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.workAddressEntryVar)
+        self.workAddressEntry.grid(row=5, column=1)
 
         self.purposeEntry = Text(self.customerDetailsFrame, width=40, height=10)
         self.purposeEntry.grid(row=1, column=1)
@@ -362,14 +358,18 @@ class AddFile:
                 self.pagesList[1].enable()
             else:
                 self.pagesList[1].disable()
-            if(self.pagesList[0].typeOfLoanEntry.get()=="Loan on vehicle"):
+
+            if(self.pagesList[0].typeOfLoanEntry.get()=="Loan on vehicle" and self.pagesList[2].ok !=True):
                 self.pagesList[2].enable()
             else:
                 self.pagesList[2].disable()
-        
-        if(self.pagesList[4].loanPassed):
-            print("loanPassed")
-            if(self.pagesList[0].ok==True):
+
+            if(self.pagesList[3].ok==True):
+                self.pagesList[3].disable()
+            else:
+                self.pagesList[3].enable()
+            
+            if(self.pagesList[4].loanPassed):
                 if(self.pagesList[0].guarranterCheckVar.get()==1 and self.pagesList[0].typeOfLoanEntry.get()=="Loan on vehicle"):
                     if(self.pagesList[1].ok and self.pagesList[2].ok):
                         pass
@@ -389,6 +389,8 @@ class AddFile:
                     pass
             else:
                 print("hello")
+        
+        
 
     
     def backPage(self):
@@ -398,13 +400,18 @@ class AddFile:
         self.changePage(self.currentPageIndex+1)
         
     def cancelMethod(self):
-        children = self.section2.winfo_children()
-        for page in children:
-            page.destroy()
-        del self.pagesList
-        self.pagesList = [ApprovalPage(self.section2, parentUpdateStatus=self.updateStatus), GuarrantersPage(self.section2, parentUpdateStatus=self.updateStatus), VehiclesPage(self.section2, parentUpdateStatus=self.updateStatus), DocVerifyPage(self.section2, parentUpdateStatus=self.updateStatus), finalPage(self.section2, parentUpdateStatus=self.updateStatus)]
-        self.pagesList[1].disable()
-        self.pagesList[2].disable()
+        # children = self.section2.winfo_children()
+        # for page in children:
+        #     page.destroy()
+        # del self.pagesList
+        # self.pagesList = [ApprovalPage(self.section2, parentUpdateStatus=self.updateStatus), GuarrantersPage(self.section2, parentUpdateStatus=self.updateStatus), VehiclesPage(self.section2, parentUpdateStatus=self.updateStatus), DocVerifyPage(self.section2, parentUpdateStatus=self.updateStatus), finalPage(self.section2, parentUpdateStatus=self.updateStatus)]
+        # self.pagesList[1].disable()
+        # self.pagesList[2].disable()
+        self.pagesList[0].initialStage()
+        self.pagesList[1].initialStage()
+        self.pagesList[2].initialStage()
+        self.pagesList[3].initialStage()
+        self.pagesList[4].initialStage()
         
         self.changePage(0)
         self.updateStatus()
@@ -494,7 +501,8 @@ class ApprovalPage:
                 self.updateStatus()
             else:
                 self.ok = False
-                print("fill necessar details")
+        else:
+            self.approveLoanCheck.config(state="normal")
         
     def disable(self):
         self.approveLoanCheck.config(state="disable")
@@ -511,6 +519,15 @@ class ApprovalPage:
         self.guarranterCheck.config(state="normal")
         self.okButton.config(state="normal")
         self.approveLoanCheck.config(state="normal")
+    
+    def initialStage(self):
+        self.typeOfLoanEntry.set("")
+        self.dateApprovedEntry.config(state="normal")
+        self.dateApprovedEntry.delete(0, 'end')
+        self.guarranterCheckVar.set(0)
+        self.loanCheckVar.set(0)
+        self.enableEntries()
+        self.checkData()
 
 class GuarrantersPage:
     def __init__(self, pageWindow, parentUpdateStatus = None):
@@ -600,6 +617,7 @@ class GuarrantersPage:
         self.wAddressVar = StringVar()
         self.wAddressEntry = Entry(innersubFrame, width=14, textvariable=self.wAddressVar)
         self.wAddressEntry.grid(row=5, column=1)
+        self.customerPhotoLabel = Label(innersubFrame, image=self.customerPhoto)
 
         #this function changes widhth of entries according to the no. of characters present in entry
         #it takes two parameter one is event(default para) and one is entryList(necessary) which contains all entries whose width shouild be chnaged
@@ -700,20 +718,15 @@ class GuarrantersPage:
             requirementsFilled=False
             instructionText = "Please fill work address Field"
         else:
+            instructionText = ""
             requirementsFilled=True
         
         if(requirementsFilled):
-            self.gNameEntry.config(state='disable')
-            self.aadharEntry.config(state="disable")
-            self.fNameEntry.config(state="disable")
-            self.wAddressEntry.config(state="disable")
-            self.hAddressEntry.config(state="disable")
-            self.mobileEntry.config(state="disable")
-            self.okButton.config(state="disable")
-            self.photoSelectButton.config(state="disable")
             self.guarranterDetails = (self.gNameVar.get(), self.aadharVar.get(), self.fNameVar.get(), self.mobileVar.get(), self.hAddressVar.get(), self.wAddressVar.get(), self.photoPath)
             self.ok=True
+            self.instructionLabel.config(text=instructionText)
             self.updateStatus()
+            self.disable()
 
         else:
             self.instructionLabel.config(text=instructionText, fg="red")
@@ -737,6 +750,21 @@ class GuarrantersPage:
         self.mobileEntry.config(state="normal")
         self.okButton.config(state="normal")
         self.photoSelectButton.config(state="normal")
+    
+    def initialStage(self):
+        self.enable()
+        self.gNameEntry.delete(0, END)
+        self.aadharEntry.delete(0, END)
+        self.fNameEntry.delete(0, END)
+        self.wAddressEntry.delete(0, END)
+        self.hAddressEntry.delete(0, END)
+        self.mobileEntry.delete(0, END)
+        self.customerPhotoLabel.destroy()
+        self.instructionLabel.pack_forget()
+        self.instructionLabel.pack(side="top", fill="x",ipady=10)
+        self.photoSelectButton.grid(row=6, column=1)
+        self.disable()
+        
 
 class DocVerifyPage:
     def __init__(self, pageWindow, parentUpdateStatus=None):
@@ -845,6 +873,7 @@ class DocVerifyPage:
     
     def checkData(self):
         self.aadharReqCheck.config(state="disable")
+        self.aadharVerifyCheck.config(state="disable")
         self.rcVerifyCheck.config(state="disable")
         self.rcReqCheck.config(state="disable")
         self.pancardReqCheck.config(state="disable")
@@ -861,6 +890,7 @@ class DocVerifyPage:
     
     def disable(self):
         self.aadharReqCheck.config(state="disable")
+        self.aadharVerifyCheck.config(state="disable")
         self.rcVerifyCheck.config(state="disable")
         self.rcReqCheck.config(state="disable")
         self.pancardReqCheck.config(state="disable")
@@ -875,6 +905,7 @@ class DocVerifyPage:
     
     def enable(self):
         self.aadharReqCheck.config(state="normal")
+        self.aadharVerifyCheck.config(state="normal")
         self.rcVerifyCheck.config(state="normal")
         self.rcReqCheck.config(state="normal")
         self.pancardReqCheck.config(state="normal")
@@ -886,6 +917,22 @@ class DocVerifyPage:
         self.chequeReqCheck.config(state="normal")
         self.chequeVerifyCheck.config(state="normal")
         self.okButton.config(state="normal")
+    
+    def initialStage(self):
+        self.enable()
+        self.aadharReqVar.set(0)
+        self.aadharVerifyVar.set(0)
+        self.pancardReqVar.set(0)
+        self.pancardVerifyVar.set(0)
+        self.chequeReqVar.set(0)
+        self.chequeVerifyVar.set(0)
+        self.stampReqVar.set(0)
+        self.stampVerifyVar.set(0)
+        self.mobileReqVar.set(0)
+        self.mobileVerifyVar.set(0)
+        self.rcReqVar.set(0)
+        self.rcVerifyVar.set(0)
+        self.disable()
 
 class VehiclesPage:
     def __init__(self, pageWindow, parentUpdateStatus=None):
@@ -1054,6 +1101,20 @@ class VehiclesPage:
         self.operationButton.config(state="normal")
         self.numberPlateEntry.config(state="normal")
 
+    def initialStage(self):
+        self.enable()
+        self.modelEntry.delete(0, END)
+        self.manufacturerEntry.delete(0, END)
+        self.fuelUsedEntry.delete(0, END)
+        self.engineCCEntry.delete(0, END)
+        self.horsePowerEntry.delete(0, END)
+        self.numCyilendersEntry.delete(0, END)
+        self.fuelCapacityEntry.delete(0, END)
+        self.seatingCapacityEntry.delete(0, END)
+        self.vehicleWeightEntry.delete(0, END)
+        self.numberPlateEntry.delete(0, END)
+        self.disable()
+
 class finalPage:
     def __init__(self, pageWindow, parentUpdateStatus=None):
         self.loanPassed = False
@@ -1123,6 +1184,28 @@ class finalPage:
     def updateStatus(self):
         if(self.parentUpdateStatus):
             self.parentUpdateStatus()
+    
+    def enable(self):
+        self.saveButton.config(state="normal")
+        self.amountApprovedEntry.config(state="normal")
+        self.interestEntry.config(state="normal")
+        self.loanPeriodEntry.config(state="normal")
+        self.installmentAmtEntry.config(state="normal")
+
+    def disable(self):
+        self.saveButton.config(state="disable")
+        self.amountApprovedEntry.config(state="disable")
+        self.interestEntry.config(state="disable")
+        self.loanPeriodEntry.config(state="disable")
+        self.installmentAmtEntry.config(state="disable")
+
+    def initialStage(self):
+        self.enable()
+        self.amountApprovedVar.set(0.0)
+        self.interestVar.set(0.0)
+        self.loanPeriodVar.set(0.0)
+        self.installmentAmtVar.set(0.0)
+        self.disable()
 
 if __name__=="__main__":
     root = Tk()
