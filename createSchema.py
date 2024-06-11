@@ -15,7 +15,7 @@ cursor.execute(F"create database if not exists {DATABASE}")
 cursor.execute(F"use {DATABASE}")
 
 #create customers table
-cursor.execute("create table if not exists customers(id int primary key, name text, father text, mobile bigint, home_address text, work_address text, aadhar bigint, photo text, status int)")
+cursor.execute("create table if not exists customers(id int primary key, name text, father text, mobile bigint, home_address text, work_address text, aadhar bigint unique, photo text, status int)")
 
 #create files table
 cursor.execute("create table if not exists files(id int primary key, customer_id int, loan_amount bigint, interest_rate int, time_period_months int, file_status int, emi_amount bigint, num_of_emi int, note text)")

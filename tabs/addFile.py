@@ -10,7 +10,9 @@ from pathConfig import CUSTOMERPHOTOPATH
 #now we can import Customer and Requests class successfully from customer model and Rewusts model respectively
 from Customer import Customer
 from File import File
+from Requests import Requests
 from Ledger import Ledger
+import tkinter.messagebox as message
 from Requests import Requests
 
 
@@ -316,7 +318,7 @@ class AddFile:
     #refresh button replenis new data in self.data and renews items in listbox of requests
     def refresh(self):
         #reading the all data of requests from database
-        requestsData = Requests().readAllData()
+        requestsData = Requests().whereData(status=1)
 
         customerObject = Customer()
         self.dataList = []
@@ -372,27 +374,82 @@ class AddFile:
             if(self.pagesList[4].loanPassed):
                 if(self.pagesList[0].guarranterCheckVar.get()==1 and self.pagesList[0].typeOfLoanEntry.get()=="Loan on vehicle"):
                     if(self.pagesList[1].ok and self.pagesList[2].ok):
-                        pass
+                        if(self.pagesList[3].ok):
+                            customerObject = Customer()
+                            customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
+                            fileObject = File()
+                            loanAmount=self.pagesList[4].amountApprovedVar.get()
+                            interest=self.pagesList[4].interestVar.get()
+                            timePeriod=self.pagesList[4].loanPeriodVar.get()
+                            emiAmount=self.pagesList[4].installmentAmtVar.get()
+                            insertSuccessfully=False
+                            try:
+                                numEmi=str(int(int(loanAmount)/int(emiAmount)))
+                            except:
+                                numEmi="0"
+                            insertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numEmi,  note=self.purposeEntry.get())
+                            if(insertSuccessfully):
+                                print("loanPassed")
+                                requestsObject = Requests()
+                                id=requestsObject.whereData(customer_id=customerId)[0][0]
+                                requestsObject.updateData(id=id, status="0")
+                                message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
+                                self.cancelMethod()
+                                self.refresh()
+                            else:
+                                print("unsuccessfull")
+                        else:
+                            self.changePage(3)
                     else:
-                        print("fil necessary things")
+                        self.pagesList[4].loanPassed=False
+                        if(not self.pagesList[1].ok):
+                            self.changePage(1)
+                            self.pagesList[1].checkData()
+                        else:
+                            self.changePage(2)
                 elif(self.pagesList[0].guarranterCheckVar.get()==1 and self.pagesList[0].typeOfLoanEntry.get()=="Personal Loan"):
                     if(self.pagesList[1].ok):
-                        pass
+                        if(self.pagesList[3].ok):
+                            pass
+                        else:
+                            self.changePage(3)
                     else:
-                        print("fil necessary things")
+                        self.pagesList[4].loanPassed=False
+                        if(not self.pagesList[1].ok):
+                            self.changePage(1)
+                            self.pagesList[1].checkData()
                 elif(self.pagesList[0].typeOfLoanEntry.get() == "Loan on vehicle" and not self.pagesList[0].guarranterCheckVar.get()):
                     if(self.pagesList[2].ok):
-                        pass
+                        if(self.pagesList[3].ok):
+                            pass
+                        else:
+                            self.changePage(3)
                     else:
-                        print("fil necessary things")
-                else:
-                    pass
+                        self.pagesList[4].loanPassed=False
+                        if(not self.pagesList[2].ok):
+                            self.changePage(2)
+                            self.pagesList[2].checkData()
+                
+                elif(self.pagesList[0].typeOfLoanEntry.get() == "Personal Loan" and not self.pagesList[0].guarranterCheckVar.get()):
+                    if(self.pagesList[3].ok):
+                            pass
+                    else:
+                        self.changePage(3)
+                elif(self.pagesList[0].typeOfLoanEntry.get() == "Personal Loan" and self.pagesList[0].guarranterCheckVar.get()):
+                    if(self.pagesList[1].ok):
+                        if(self.pagesList[3].ok):
+                            pass
+                        else:
+                            self.changePage(3)
+                    else:
+                        self.pagesList[4].loanPassed=False
+                        self.changePage(1)
+                        self.pagesList[1].checkData()
+                
             else:
-                print("hello")
-        
+                self.pagesList[4].enable()
         
 
-    
     def backPage(self):
         self.changePage(self.currentPageIndex-1)
 
@@ -412,7 +469,8 @@ class AddFile:
         self.pagesList[2].initialStage()
         self.pagesList[3].initialStage()
         self.pagesList[4].initialStage()
-        
+        self.pagesList[0].ok=False
+
         self.changePage(0)
         self.updateStatus()
 
@@ -602,9 +660,48 @@ class GuarrantersPage:
         self.aadharEntry = Entry(innersubFrame, width=14, textvariable=self.aadharVar)
         self.aadharEntry.grid(row=1, column=1)
 
+        #event handler for aadhar entry to restrict user from entering more than 12 digits or letters, character
+        def aadharEntryEventHandler(event):
+            tempString = ""
+            for char in self.aadharEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            if(len(tempString)>12):
+                tempString = tempString[0:12]
+                self.aadharEntry.delete(0, "end")
+                self.aadharEntry.insert("end", tempString)
+            else:
+                self.aadharEntry.delete(0, "end")
+                self.aadharEntry.insert("end", tempString)
+
+        self.aadharEntry.bind("<KeyRelease>", aadharEntryEventHandler)
+
         self.mobileVar = StringVar()
         self.mobileEntry = Entry(innersubFrame, width=14, textvariable=self.mobileVar)
         self.mobileEntry.grid(row=2, column=1)
+
+        #event handler for mobile entry to restrict user from entering more than 12 digits or letters, character
+        def mobileEntryEventHandler(event):
+            tempString = ""
+            for char in self.mobileEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            if(len(tempString)>10):
+                tempString = tempString[0:10]
+                self.mobileEntry.delete(0, "end")
+                self.mobileEntry.insert("end", tempString)
+            else:
+                self.mobileEntry.delete(0, "end")
+                self.mobileEntry.insert("end", tempString)
+
+        self.mobileEntry.bind("<KeyRelease>", mobileEntryEventHandler)
+
 
         self.fNameVar = StringVar()
         self.fNameEntry = Entry(innersubFrame, width=14, textvariable=self.fNameVar)
@@ -1001,27 +1098,27 @@ class VehiclesPage:
         self.fuelUsedEntry = ttk.Combobox(self.vehicleDetailsFrame, state="readonly", values=["Petrol", "Diesel"], textvariable=self.fuelUsedVar, width=12, justify="center")
         self.fuelUsedEntry.grid(row=2, column=1, pady=10)
 
-        self.engineCCVar = DoubleVar()
+        self.engineCCVar = StringVar()
         self.engineCCEntry = Entry(self.vehicleDetailsFrame, textvariable=self.engineCCVar, width=14, justify="center")
         self.engineCCEntry.grid(row=3, column=1, pady=10)
 
-        self.horsePowerVar = DoubleVar()
+        self.horsePowerVar = StringVar()
         self.horsePowerEntry = Entry(self.vehicleDetailsFrame, textvariable=self.horsePowerVar, width=14, justify="center")
         self.horsePowerEntry.grid(row=4, column=1, pady=10)
 
-        self.numCyilendersVar = IntVar()
+        self.numCyilendersVar = StringVar()
         self.numCyilendersEntry = Entry(self.vehicleDetailsFrame, textvariable=self.numCyilendersVar, width=14, justify="center")
         self.numCyilendersEntry.grid(row=5, column=1, pady=10)
 
-        self.fuelCapacityVar = DoubleVar()
+        self.fuelCapacityVar = StringVar()
         self.fuelCapacityEntry = Entry(self.vehicleDetailsFrame, textvariable=self.fuelCapacityVar, width=14, justify="center")
         self.fuelCapacityEntry.grid(row=6, column=1, pady=10)
 
-        self.seatingCapacityVar = IntVar()
+        self.seatingCapacityVar = StringVar()
         self.seatingCapacityEntry = Entry(self.vehicleDetailsFrame, textvariable=self.seatingCapacityVar, width=14, justify="center")
         self.seatingCapacityEntry.grid(row=7, column=1, pady=10)
 
-        self.vehicleWeightVar = DoubleVar()
+        self.vehicleWeightVar = StringVar()
         self.vehicleWeightEntry = Entry(self.vehicleDetailsFrame, textvariable=self.vehicleWeightVar, width=14, justify="center")
         self.vehicleWeightEntry.grid(row=8, column=1, pady=10)
 
@@ -1040,6 +1137,9 @@ class VehiclesPage:
         elif(not self.manufaturerVar.get()):
             requirementsFilled=False
             instructionText = "Manufacturer field is necessary"
+        elif(not self.numberPlateVar.get()):
+            requirementsFilled=False
+            instructionText = "Number Plate field is necessary"
         else:
             instructionText = "Vehicle added successfully"
             requirementsFilled=True
@@ -1161,21 +1261,79 @@ class finalPage:
         self.saveButton = Button(self.finalDataFrame, text="Loan Pass", bg="light green", command=self.save)
         self.saveButton.grid(row=4, column=1, sticky="we", pady=20)
 
-        self.amountApprovedVar = DoubleVar()
+        self.amountApprovedVar = StringVar()
         self.amountApprovedEntry = Entry(self.finalDataFrame, textvariable=self.amountApprovedVar)
         self.amountApprovedEntry.grid(row=0, column=1)
 
-        self.interestVar = DoubleVar()
+        #event handler for amountApprovedEntry to restrict user from entering letters, character
+        def amountApprovedEntryEventHandler(event):
+            tempString = ""
+            for char in self.amountApprovedEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            self.amountApprovedEntry.delete(0, "end")
+            self.amountApprovedEntry.insert("end", tempString)
+
+        self.amountApprovedEntry.bind("<KeyRelease>", amountApprovedEntryEventHandler)
+
+
+        self.interestVar = StringVar()
         self.interestEntry = Entry(self.finalDataFrame, textvariable=self.interestVar)
         self.interestEntry.grid(row=1, column=1)
 
-        self.loanPeriodVar = DoubleVar()
+        #event handler for amountApprovedEntry to restrict user from entering letters, character
+        def interestEntryEventHandler(event):
+            tempString = ""
+            for char in self.interestEntry.get():
+                if(not (char.isdigit() or char==".")):
+                    pass
+                elif((char.isdigit() or char==".")):
+                    tempString+=char
+            
+            self.interestEntry.delete(0, "end")
+            self.interestEntry.insert("end", tempString)
+
+        self.interestEntry.bind("<KeyRelease>", interestEntryEventHandler)
+
+        self.loanPeriodVar = StringVar()
         self.loanPeriodEntry = Entry(self.finalDataFrame, textvariable=self.loanPeriodVar)
         self.loanPeriodEntry.grid(row=2, column=1)
+
+        #event handler for amountApprovedEntry to restrict user from entering letters, character
+        def loanPeriodEntryEventHandler(event):
+            tempString = ""
+            for char in self.loanPeriodEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+        
+            self.loanPeriodEntry.delete(0, "end")
+            self.loanPeriodEntry.insert("end", tempString)
+
+        self.loanPeriodEntry.bind("<KeyRelease>", loanPeriodEntryEventHandler)
+
 
         self.installmentAmtVar = DoubleVar()
         self.installmentAmtEntry = Entry(self.finalDataFrame, textvariable=self.installmentAmtVar)
         self.installmentAmtEntry.grid(row=3, column=1)
+
+        #event handler for amountApprovedEntry to restrict user from entering letters, character
+        def installmentAmtEntryEventHandler(event):
+            tempString = ""
+            for char in self.installmentAmtEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+        
+            self.installmentAmtEntry.delete(0, "end")
+            self.installmentAmtEntry.insert("end", tempString)
+
+        self.installmentAmtEntry.bind("<KeyRelease>", installmentAmtEntryEventHandler)
 
     def save(self):
         self.loanPassed = True
@@ -1205,6 +1363,7 @@ class finalPage:
         self.interestVar.set(0.0)
         self.loanPeriodVar.set(0.0)
         self.installmentAmtVar.set(0.0)
+        self.loanPassed=False
         self.disable()
 
 if __name__=="__main__":
