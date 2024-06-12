@@ -5,7 +5,7 @@ from sys import path
 path.append(r"D:\projects\finoshok\finoshok\model")
 #now we can import Customer and Requests class successfully from customer model and Rewusts model respectively
 from Customer import Customer
-from Requests import Requests
+from Request import Requests
 from tkinter.messagebox import showinfo
 
 #AddFile class needs a parameter either a tk window or frame

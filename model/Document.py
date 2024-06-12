@@ -4,9 +4,8 @@ import sys
 sys.path.append(r"D:\projects\finoshok\finoshok")
 from model import Model
 
-class File(Model):
+class Document(Model):
     #fillable insertion will only occur in the columns present in fillable variable
     #setting the tablename to customers to work with only customers table
-    fillable=["customerId", "loanAmount", "interest", "timePeriod", "status", "emiAmount", "numEmi", "note", "guarranterId", "dateApproved", 'loanType']
-    
-    tableName="file"
+    fillable=["customer_id", "doc_name", "doc_path", "status", "submitted_date", "returned_date", "required", "verified", "file_id"]
+    tableName="documents"

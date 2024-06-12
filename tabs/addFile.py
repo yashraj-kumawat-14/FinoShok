@@ -7,13 +7,16 @@ from sys import path
 path.append(r"D:\projects\finoshok\finoshok\model")
 path.append(r"D:\projects\finoshok\finoshok\config")
 from pathConfig import CUSTOMERPHOTOPATH
-#now we can import Customer and Requests class successfully from customer model and Rewusts model respectively
+#now we can import Customer and Request class successfully from customer model and Rewusts model respectively
 from Customer import Customer
 from File import File
-from Requests import Requests
 from Ledger import Ledger
 import tkinter.messagebox as message
-from Requests import Requests
+from Request import Request
+from Guarranter import Guarranter
+from Document import Document
+from Vehicle import Vehicle
+from Ledger import Ledger
 from settings import INTERESTRATE
 
 
@@ -49,7 +52,7 @@ class AddFile:
 
         #now creating 3 sections : 
 
-        #section 1 for selecting any one loan requests also adding heading/label
+        #section 1 for selecting any one loan Request also adding heading/label
         self.searchFrame = Frame(self.subFrame1)
         self.searchFrame.pack(side="top", fill="x")
 
@@ -316,16 +319,16 @@ class AddFile:
             #performing cancel method
             self.cancelMethod()
     
-    #refresh button replenis new data in self.data and renews items in listbox of requests
+    #refresh button replenis new data in self.data and renews items in listbox of Request
     def refresh(self):
-        #reading the all data of requests from database
-        requestsData = Requests().whereData(status=1)
+        #reading the all data of Request from database
+        RequestData = Request().whereData(status=1)
 
         customerObject = Customer()
         self.dataList = []
 
         #updating self.datalist and self.customerRequestBox
-        for request in requestsData:
+        for request in RequestData:
             tempCustomerData = customerObject.whereData(id=request[1])
 
             self.dataList.append({"customerId":tempCustomerData[0][0], "aadhar":tempCustomerData[0][6], "name":tempCustomerData[0][1], "father":tempCustomerData[0][2], "mobile":tempCustomerData[0][3], "homeAddress":tempCustomerData[0][4], "workAddress": tempCustomerData[0][5], "status":request[5], "purpose":request[3], "amountRequested": request[2], "dateRequested":request[4]})
@@ -378,22 +381,50 @@ class AddFile:
                         if(self.pagesList[3].ok):
                             customerObject = Customer()
                             customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
+
                             fileObject = File()
                             loanAmount=self.pagesList[4].amountApprovedVar.get()
                             interest=self.pagesList[4].interestVar.get()
                             timePeriod=self.pagesList[4].loanPeriodVar.get()
                             emiAmount=self.pagesList[4].installmentAmtVar.get()
+                            numOfEmi = self.pagesList[4].numOfEmiVar.get()
+                            dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"-"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"-"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
+
+                            insertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get(), dateApproved=dateApproved, loanType="Loan on vehicles")
+
+                            fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)
+
+                            guarranterObject = Guarranter()
+                            guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), photo=self.pagesList[1].photoPath, status=1)
+
+                            documentObject = Document()
+                            documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="pancard", required=self.pagesList[3].pancardReqVar.get(), verified=self.pagesList[3].pancardVerifyVar.get(), file_id=fileId, status=self.pagesList[3].pancardVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="cheque", required=self.pagesList[3].chequeReqVar.get(), verified=self.pagesList[3].chequeVerifyVar.get(), file_id=fileId, status=self.pagesList[3].chequeVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="stamp", required=self.pagesList[3].stampReqVar.get(), verified=self.pagesList[3].stampVerifyVar.get(), file_id=fileId, status=self.pagesList[3].stampVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="rc", required=self.pagesList[3].rcReqVar.get(), verified=self.pagesList[3].rcVerifyVar.get(), file_id=fileId, status=self.pagesList[3].rcVerifyVar.get())
+
+                            vehicleObject = Vehicle()
+                            vehicleObject.insertData(customerId=customerId, name=self.pagesList[2].vNameVar.get(), plateNum=self.pagesList[2].numberPlateVar.get(), model=self.pagesList[2].modelVar.get(), manufacturer=self.pagesList[2].manufacturerVar.get(), note="sud", fuel=self.pagesList[2].fuelUsedVar.get(), engineCC=self.pagesList[2].engineCCVar.get(), horsePowerBHP=self.pagesList[2].horsePowerVar.get(), cyilenders=self.pagesList[2].numCyilendersVar.get() ,fuelCapacity=self.pagesList[2].fuelCapacityVar.get() ,seatingCapacity=self.pagesList[2].seatingCapacityVar.get(), vehicleWeightKG=self.pagesList[2].vehicleWeightVar.get(), status=1, condition="fine")
+
+                            ledgerObject = Ledger()
+                            itemIids =  self.pagesList[4].table.get_children()
+                            for iid in itemIids:
+                                values = self.pagesList[4].table.item(iid, "values")
+                                ledgerObject.insertData(customerId=customerId, fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
+
                             insertSuccessfully=False
-                            try:
-                                numEmi=str(int(int(loanAmount)/int(emiAmount)))
-                            except:
-                                numEmi="0"
-                            insertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numEmi,  note=self.purposeEntry.get())
+                            
                             if(insertSuccessfully):
+                                fileObject.updateData()
                                 print("loanPassed")
-                                requestsObject = Requests()
-                                id=requestsObject.whereData(customer_id=customerId)[0][0]
-                                requestsObject.updateData(id=id, status="0")
+                                RequestObject = Request()
+                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
                                 self.cancelMethod()
                                 self.refresh()
@@ -408,6 +439,8 @@ class AddFile:
                             self.pagesList[1].checkData()
                         else:
                             self.changePage(2)
+                            self.pagesList[2].checkData()
+
                 elif(self.pagesList[0].guarranterCheckVar.get()==1 and self.pagesList[0].typeOfLoanEntry.get()=="Personal Loan"):
                     if(self.pagesList[1].ok):
                         if(self.pagesList[3].ok):
@@ -1057,75 +1090,82 @@ class VehiclesPage:
 
         self.vehicle = None
 
+        self.vNameLable = Label(self.vehicleDetailsFrame, text="Vehicle Name : ")
+        self.vNameLable.grid(row=0, column=0)
+
         self.modelLabel = Label(self.vehicleDetailsFrame, text="Model : ")
-        self.modelLabel.grid(row=0, column=0)
+        self.modelLabel.grid(row=1, column=0)
 
         self.manufaturerLabel = Label(self.vehicleDetailsFrame, text="Manufacturer : ")
-        self.manufaturerLabel.grid(row=1, column=0)
+        self.manufaturerLabel.grid(row=2, column=0)
 
         self.fuelUsedLabel = Label(self.vehicleDetailsFrame, text="Fuel Used : ")
-        self.fuelUsedLabel.grid(row=2, column=0)
+        self.fuelUsedLabel.grid(row=3, column=0)
 
         self.engineCCLabel = Label(self.vehicleDetailsFrame, text="Engine (CC) : ")
-        self.engineCCLabel.grid(row=3, column=0)
+        self.engineCCLabel.grid(row=4, column=0)
 
         self.horsePowerLabel = Label(self.vehicleDetailsFrame, text="Horse Power(BHP) : ")
-        self.horsePowerLabel.grid(row=4, column=0)
+        self.horsePowerLabel.grid(row=5, column=0)
 
         self.numCyilendersLabel = Label(self.vehicleDetailsFrame, text="No. of Cyilenders : ")
-        self.numCyilendersLabel.grid(row=5, column=0)
+        self.numCyilendersLabel.grid(row=6, column=0)
 
         self.fuelCapacityLabel = Label(self.vehicleDetailsFrame, text="Fuel Capacity (Litre) : ")
-        self.fuelCapacityLabel.grid(row=6, column=0)
+        self.fuelCapacityLabel.grid(row=7, column=0)
 
         self.seatingCapacityLabel = Label(self.vehicleDetailsFrame, text="Seating Capacity : ")
-        self.seatingCapacityLabel.grid(row=7, column=0)
+        self.seatingCapacityLabel.grid(row=8, column=0)
 
         self.vehicleWeightLabel = Label(self.vehicleDetailsFrame, text="Vehicle Weight (Kg) : ")
-        self.vehicleWeightLabel.grid(row=8, column=0)
+        self.vehicleWeightLabel.grid(row=9, column=0)
 
         self.numberPlateLabel = Label(self.vehicleDetailsFrame, text="Number plate : ")
-        self.numberPlateLabel.grid(row=9, column=0)
+        self.numberPlateLabel.grid(row=10, column=0)
+
+        self.vNameVar = StringVar()
+        self.vNameEntry = Entry(self.vehicleDetailsFrame, textvariable=self.vNameVar, width=14, justify="center")
+        self.vNameEntry.grid(row=0, column=1, pady=10)
 
         self.modelVar = StringVar()
         self.modelEntry = Entry(self.vehicleDetailsFrame, textvariable=self.modelVar, width=14, justify="center")
-        self.modelEntry.grid(row=0, column=1, pady=10)
+        self.modelEntry.grid(row=1, column=1, pady=10)
 
-        self.manufaturerVar = StringVar()
-        self.manufacturerEntry = ttk.Combobox(self.vehicleDetailsFrame, state="readonly", values=["Hero", "Honda", "Suzuki"], textvariable=self.manufaturerVar, width=12, justify="center")
-        self.manufacturerEntry.grid(row=1, column=1, pady=10)
+        self.manufacturerVar = StringVar()
+        self.manufacturerEntry = ttk.Combobox(self.vehicleDetailsFrame, state="readonly", values=["Hero", "Honda", "Suzuki"], textvariable=self.manufacturerVar, width=12, justify="center")
+        self.manufacturerEntry.grid(row=2, column=1, pady=10)
 
         self.fuelUsedVar = StringVar()
         self.fuelUsedEntry = ttk.Combobox(self.vehicleDetailsFrame, state="readonly", values=["Petrol", "Diesel"], textvariable=self.fuelUsedVar, width=12, justify="center")
-        self.fuelUsedEntry.grid(row=2, column=1, pady=10)
+        self.fuelUsedEntry.grid(row=3, column=1, pady=10)
 
         self.engineCCVar = StringVar()
         self.engineCCEntry = Entry(self.vehicleDetailsFrame, textvariable=self.engineCCVar, width=14, justify="center")
-        self.engineCCEntry.grid(row=3, column=1, pady=10)
+        self.engineCCEntry.grid(row=4, column=1, pady=10)
 
         self.horsePowerVar = StringVar()
         self.horsePowerEntry = Entry(self.vehicleDetailsFrame, textvariable=self.horsePowerVar, width=14, justify="center")
-        self.horsePowerEntry.grid(row=4, column=1, pady=10)
+        self.horsePowerEntry.grid(row=5, column=1, pady=10)
 
         self.numCyilendersVar = StringVar()
         self.numCyilendersEntry = Entry(self.vehicleDetailsFrame, textvariable=self.numCyilendersVar, width=14, justify="center")
-        self.numCyilendersEntry.grid(row=5, column=1, pady=10)
+        self.numCyilendersEntry.grid(row=6, column=1, pady=10)
 
         self.fuelCapacityVar = StringVar()
         self.fuelCapacityEntry = Entry(self.vehicleDetailsFrame, textvariable=self.fuelCapacityVar, width=14, justify="center")
-        self.fuelCapacityEntry.grid(row=6, column=1, pady=10)
+        self.fuelCapacityEntry.grid(row=7, column=1, pady=10)
 
         self.seatingCapacityVar = StringVar()
         self.seatingCapacityEntry = Entry(self.vehicleDetailsFrame, textvariable=self.seatingCapacityVar, width=14, justify="center")
-        self.seatingCapacityEntry.grid(row=7, column=1, pady=10)
+        self.seatingCapacityEntry.grid(row=8, column=1, pady=10)
 
         self.vehicleWeightVar = StringVar()
         self.vehicleWeightEntry = Entry(self.vehicleDetailsFrame, textvariable=self.vehicleWeightVar, width=14, justify="center")
-        self.vehicleWeightEntry.grid(row=8, column=1, pady=10)
+        self.vehicleWeightEntry.grid(row=9, column=1, pady=10)
 
         self.numberPlateVar = StringVar()
         self.numberPlateEntry = Entry(self.vehicleDetailsFrame, textvariable=self.numberPlateVar, width=14, justify="center")
-        self.numberPlateEntry.grid(row=9, column=1, pady=10)
+        self.numberPlateEntry.grid(row=10, column=1, pady=10)
 
         self.operationButton = Button(self.operationFrame, text="Add Vehicle", command=self.checkData)
         self.operationButton.pack(fill="x")
@@ -1183,6 +1223,7 @@ class VehiclesPage:
         self.engineCCEntry.config(state="disable")
         self.horsePowerEntry.config(state="disable")
         self.numCyilendersEntry.config(state="disable")
+        self.vNameEntry.config(state="disable")
         self.fuelCapacityEntry.config(state="disable")
         self.seatingCapacityEntry.config(state="disable")
         self.vehicleWeightEntry.config(state="disable")
@@ -1190,6 +1231,7 @@ class VehiclesPage:
         self.numberPlateEntry.config(state="disable")
 
     def enable(self):
+        self.vNameEntry.config(state="normal")
         self.modelEntry.config(state="normal")
         self.manufacturerEntry.config(state="normal")
         self.fuelUsedEntry.config(state="normal")
@@ -1205,6 +1247,7 @@ class VehiclesPage:
     def initialStage(self):
         self.enable()
         self.modelEntry.delete(0, END)
+        self.vNameEntry.delete(0, END)
         self.manufacturerEntry.delete(0, END)
         self.fuelUsedEntry.delete(0, END)
         self.engineCCEntry.delete(0, END)
