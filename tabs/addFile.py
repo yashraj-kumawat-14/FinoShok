@@ -14,6 +14,7 @@ from Requests import Requests
 from Ledger import Ledger
 import tkinter.messagebox as message
 from Requests import Requests
+from settings import INTERESTRATE
 
 
 #AddFile class needs a parameter either a tk window or frame
@@ -1223,10 +1224,25 @@ class finalPage:
         self.mainFrame.grid(row=0, column=0, sticky="nsew")
 
         self.mainFrame.rowconfigure(0, weight=1)
+        self.mainFrame.rowconfigure(1, weight=1)
+        self.mainFrame.rowconfigure(3, weight=1)
+        self.mainFrame.rowconfigure(4, weight=1)
         self.mainFrame.columnconfigure(0, weight=1)
 
-        self.innerMainFrame = Frame(self.mainFrame, borderwidth=2, relief="raised")
-        self.innerMainFrame.grid(row=0, column=0)
+        self.firstInnerMainFrame = Frame(self.mainFrame, borderwidth=2, relief="raised" , width=450, height=150)
+        self.firstInnerMainFrame.grid(row=0, column=0, sticky="nsew")
+
+        self.firstInnerMainFrame.rowconfigure(0, weight=1)
+        self.firstInnerMainFrame.columnconfigure(0, weight=1)
+
+        self.firstInnerMainFrame.grid_propagate(False)
+
+        self.innerMainFrame = Frame(self.firstInnerMainFrame, borderwidth=2)
+        self.innerMainFrame.grid(row=0,column=0)
+        
+
+        self.secondInnerMainFrame = Frame(self.mainFrame, borderwidth=2, relief="raised")
+        self.secondInnerMainFrame.grid(row=1, column=0, sticky="nsew", rowspan=4)
 
         self.instructionLabel = Label(self.innerMainFrame, text="")
         self.instructionLabel.pack(fill="x")
@@ -1243,27 +1259,39 @@ class finalPage:
         self.interestLabel = Label(self.finalDataFrame, text="Interest : ")
         self.interestLabel.grid(row=1, column=0)
 
-        self.interestPercentLabel = Label(self.finalDataFrame, text="% per month")
+        self.interestPercentLabel = Label(self.finalDataFrame, text="% per annum")
         self.interestPercentLabel.grid(row=1, column=2)
 
+        self.numOfEmi = Label(self.finalDataFrame, text="Num EMI : ")
+        self.numOfEmi.grid(row=2, column=0)
         self.loanPeriodLabel = Label(self.finalDataFrame, text="Loan Period : ")
-        self.loanPeriodLabel.grid(row=2, column=0)
+        self.loanPeriodLabel.grid(row=3, column=0)
 
         self.loanTimeLabel = Label(self.finalDataFrame, text="In months")
-        self.loanTimeLabel.grid(row=2, column=2)
+        self.loanTimeLabel.grid(row=3, column=2)
 
-        self.installmentAmtLabel = Label(self.finalDataFrame, text="Installment Amount : ")
-        self.installmentAmtLabel.grid(row=3, column=0)
+        self.installmentAmtLabel = Label(self.finalDataFrame, text="EMI Amount : ")
+        self.installmentAmtLabel.grid(row=4, column=0)
 
-        self.rupeesLabel2 = Label(self.finalDataFrame, text="₹")
-        self.rupeesLabel2.grid(row=3, column=2)
+        self.rupeesLabel2 = Label(self.finalDataFrame, text="₹ per 30 days")
+        self.rupeesLabel2.grid(row=4, column=2)
+
+        self.startDateLabel = Label(self.finalDataFrame, text="Start Date : ")
+        self.startDateLabel.grid(row=5, column=0)
+
 
         self.saveButton = Button(self.finalDataFrame, text="Loan Pass", bg="light green", command=self.save)
-        self.saveButton.grid(row=4, column=1, sticky="we", pady=20)
+        self.saveButton.grid(row=6, column=0, sticky="we", pady=20, columnspan=3)
 
         self.amountApprovedVar = StringVar()
-        self.amountApprovedEntry = Entry(self.finalDataFrame, textvariable=self.amountApprovedVar)
+
+        #initialValue 
+        self.amountApprovedEntry = Entry(self.finalDataFrame, textvariable=self.amountApprovedVar, justify="center")
         self.amountApprovedEntry.grid(row=0, column=1)
+
+
+        #updating root after creating this many widgets and configurations
+        root.update()
 
         #event handler for amountApprovedEntry to restrict user from entering letters, character
         def amountApprovedEntryEventHandler(event):
@@ -1276,13 +1304,34 @@ class finalPage:
             
             self.amountApprovedEntry.delete(0, "end")
             self.amountApprovedEntry.insert("end", tempString)
+            self.dynamicTableDetails()
 
         self.amountApprovedEntry.bind("<KeyRelease>", amountApprovedEntryEventHandler)
 
 
         self.interestVar = StringVar()
-        self.interestEntry = Entry(self.finalDataFrame, textvariable=self.interestVar)
+        self.interestEntry = Entry(self.finalDataFrame, textvariable=self.interestVar, justify="center")
         self.interestEntry.grid(row=1, column=1)
+
+        #created varialble to store total no.of emis
+        self.numOfEmiVar = StringVar()
+        self.numOfEmiEntry = Entry(self.finalDataFrame, textvariable=self.numOfEmiVar, justify="center")
+        self.numOfEmiEntry.grid(row=2, column=1) 
+
+        # Eventhandlere for numOfEmiEntry
+        def numOfEmiEntryHandler(event):
+            tempString = ""
+            for char in self.numOfEmiEntry.get():
+                if(not char.isdigit()):
+                    pass
+                elif(char.isdigit()):
+                    tempString+=char
+            
+            self.numOfEmiEntry.delete(0, "end")
+            self.numOfEmiEntry.insert("end", tempString)
+            self.dynamicTableDetails()
+
+        self.numOfEmiEntry.bind("<KeyRelease>", numOfEmiEntryHandler)
 
         #event handler for amountApprovedEntry to restrict user from entering letters, character
         def interestEntryEventHandler(event):
@@ -1295,12 +1344,13 @@ class finalPage:
             
             self.interestEntry.delete(0, "end")
             self.interestEntry.insert("end", tempString)
+            self.dynamicTableDetails()
 
         self.interestEntry.bind("<KeyRelease>", interestEntryEventHandler)
 
         self.loanPeriodVar = StringVar()
-        self.loanPeriodEntry = Entry(self.finalDataFrame, textvariable=self.loanPeriodVar)
-        self.loanPeriodEntry.grid(row=2, column=1)
+        self.loanPeriodEntry = Entry(self.finalDataFrame, textvariable=self.loanPeriodVar, justify="center")
+        self.loanPeriodEntry.grid(row=3, column=1)
 
         #event handler for amountApprovedEntry to restrict user from entering letters, character
         def loanPeriodEntryEventHandler(event):
@@ -1313,13 +1363,14 @@ class finalPage:
         
             self.loanPeriodEntry.delete(0, "end")
             self.loanPeriodEntry.insert("end", tempString)
+            self.dynamicTableDetails()
 
         self.loanPeriodEntry.bind("<KeyRelease>", loanPeriodEntryEventHandler)
 
 
-        self.installmentAmtVar = DoubleVar()
-        self.installmentAmtEntry = Entry(self.finalDataFrame, textvariable=self.installmentAmtVar)
-        self.installmentAmtEntry.grid(row=3, column=1)
+        self.installmentAmtVar = StringVar()
+        self.installmentAmtEntry = Entry(self.finalDataFrame, textvariable=self.installmentAmtVar, justify="center")
+        self.installmentAmtEntry.grid(row=4, column=1)
 
         #event handler for amountApprovedEntry to restrict user from entering letters, character
         def installmentAmtEntryEventHandler(event):
@@ -1332,8 +1383,43 @@ class finalPage:
         
             self.installmentAmtEntry.delete(0, "end")
             self.installmentAmtEntry.insert("end", tempString)
+            self.dynamicTableDetails()
 
         self.installmentAmtEntry.bind("<KeyRelease>", installmentAmtEntryEventHandler)
+
+        self.startDateEntry = DateEntry(self.finalDataFrame, width=17, date_pattern="yyyy-mm-dd", justify="center", state="disable", selectmode="day")
+        self.startDateEntry.grid(row=5, column=1)
+
+        #work of secondInnerMainFrame starts here
+
+        #creating a table of emis and dates of that emi
+        self.table=ttk.Treeview(self.secondInnerMainFrame)
+
+        #scrollbar for table
+        self.tableScrollY = Scrollbar(self.secondInnerMainFrame)
+        self.tableScrollY.pack(side="right", fill="y")
+
+        #now packig table
+        self.table.pack(fill="both", expand=True)
+
+
+        #configuring scrollbar and table
+        self.table.config(yscrollcommand=self.tableScrollY.set)
+        self.tableScrollY.config(command=self.table.yview)
+
+        #creating columns for the table
+        self.table["columns"]=("serialNum", "emiDate", "emiAmount")
+
+        #setting up columns
+        self.table.column("#0", width=0, minwidth=0, stretch=False)
+        self.table.column("serialNum", width=35, minwidth=35, anchor="center", stretch=False)
+        self.table.column("emiDate", width=50, minwidth=50, anchor="center")
+        self.table.column("emiAmount", width=50, minwidth=50, anchor="center")
+
+        #creating headings for columns to show to user 
+        self.table.heading("serialNum", text="S.No.", anchor="center")
+        self.table.heading("emiDate", text="EMI Date", anchor="center")
+        self.table.heading("emiAmount", text="EMI Amount", anchor="center")
 
     def save(self):
         self.loanPassed = True
@@ -1345,26 +1431,111 @@ class finalPage:
     
     def enable(self):
         self.saveButton.config(state="normal")
+        self.numOfEmiEntry.config(state="normal")
         self.amountApprovedEntry.config(state="normal")
         self.interestEntry.config(state="normal")
         self.loanPeriodEntry.config(state="normal")
-        self.installmentAmtEntry.config(state="normal")
+        self.startDateEntry.config(state="readonly")
+        self.installmentAmtEntry.config(state="readonly")
 
     def disable(self):
         self.saveButton.config(state="disable")
         self.amountApprovedEntry.config(state="disable")
         self.interestEntry.config(state="disable")
         self.loanPeriodEntry.config(state="disable")
+        self.numOfEmiEntry.config(state="disable")
+        self.startDateEntry.config(state="disable")
         self.installmentAmtEntry.config(state="disable")
 
     def initialStage(self):
         self.enable()
-        self.amountApprovedVar.set(0.0)
-        self.interestVar.set(0.0)
-        self.loanPeriodVar.set(0.0)
-        self.installmentAmtVar.set(0.0)
+        self.amountApprovedVar.set("")
+        self.interestVar.set(INTERESTRATE)
+        self.loanPeriodVar.set("")
+        self.installmentAmtVar.set("")
+        self.installmentAmtEntry.config(state="readonly")
+        self.numOfEmiVar.set("")
+        self.rupeesLabel2.config(text="₹ per 30 days")
         self.loanPassed=False
+        self.startDateEntry.config(state="disable")
+        self.table.delete(*self.table.get_children())
         self.disable()
+
+    #this function will dynamically calculate the table data of emis and dates accordingly
+    def dynamicTableDetails(self):
+        if(self.amountApprovedVar.get() and self.loanPeriodVar.get() and self.numOfEmiVar.get() and self.interestVar.get() and self.numOfEmiVar.get()!="0" and self.startDateEntry.get_date()):
+
+            installment = int((int(self.amountApprovedVar.get())*(int(self.loanPeriodVar.get())/12)*float(self.interestVar.get())/100 + int(self.amountApprovedVar.get()))/int(self.numOfEmiVar.get()))
+            self.installmentAmtVar.set(installment)
+
+            timeGap = int(30*int(self.loanPeriodVar.get())/int(self.numOfEmiVar.get()))
+            self.rupeesLabel2.config(text=f"₹ per {int(timeGap)} days")
+
+            numOfEmi = int(self.numOfEmiVar.get())
+            
+            #deleting prexisting data from table
+            self.table.delete(*self.table.get_children())
+
+            #inserting new data into the table
+            day=self.startDateEntry.get_date().day
+            month = self.startDateEntry.get_date().month
+            year = self.startDateEntry.get_date().year
+
+            def addDays(year, month, day, n):
+                months31 = [1,3,5,7,8,10,12]
+                months30 = [4,6,9,11]
+                while n >0:
+                    if month in months31:
+                        if day +n<=31:
+                            day+=n
+                            n=0
+                        else:
+                            n-=(31-day)
+                            day=1
+                            if month == 12:
+                                month=1
+                                year+=1
+                            else:
+                                month+=1
+                    elif month in months30:
+                        if day + n <=30:
+                            day+=n
+                            n=0
+                        else:
+                            n-= (30-day)
+                            day=1
+                            month+=1
+                    elif month==2:
+                        if (year %4==0 and year%100!=0) or (year % 400 ==0):
+                            if day +n<=29:
+                                day+=n
+                                n=0
+                            else:
+                                n-= (29-day)
+                                day=1
+                                month+=1
+                        else:
+                            if day +n<=28:
+                                day+=n
+                                n=0
+                            else:
+                                n-=(28-day)
+                                day=1
+                                month+=1
+                return year, month, day
+
+            for i in range(numOfEmi):
+                self.table.insert(parent="", text="", iid=i, index="end", values=(i+1, f"{year}-{month}-{day}", installment))        
+                date=addDays(year, month, day, int(timeGap))
+                year=date[0]
+                month=date[1]
+                day=date[2]
+
+        else:
+            self.installmentAmtVar.set("")
+
+            #deleting prexisting data from table
+            self.table.delete(*self.table.get_children())
 
 if __name__=="__main__":
     root = Tk()
