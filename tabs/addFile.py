@@ -210,32 +210,32 @@ class AddFile:
 
         #creating labels dynamic
         self.customerEntryVar = StringVar()
-        self.customerEntryVar.set("name")
+        self.customerEntryVar.set("null")
         self.customerEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.customerEntryVar)
         self.customerEntry.grid(row=0, column=1)
 
         self.aadharEntryVar = StringVar()
-        self.aadharEntryVar.set("aadhar")
+        self.aadharEntryVar.set("null")
         self.aadharEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
         self.aadharEntry.grid(row=1, column=1)
 
         self.mobileEntryVar = StringVar()
-        self.mobileEntryVar.set("mobile")
+        self.mobileEntryVar.set("null")
         self.mobileEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
         self.mobileEntry.grid(row=2, column=1)
 
         self.fatherEntryVar = StringVar()
-        self.fatherEntryVar.set("father")
+        self.fatherEntryVar.set("null")
         self.fatherEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.fatherEntryVar)
         self.fatherEntry.grid(row=3, column=1)
 
         self.homeAddressEntryVar = StringVar()
-        self.homeAddressEntryVar.set("homeAddress")
+        self.homeAddressEntryVar.set("null")
         self.homeAddressEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.homeAddressEntryVar)
         self.homeAddressEntry.grid(row=4, column=1)
 
         self.workAddressEntryVar = StringVar()
-        self.workAddressEntryVar.set("workAddress")
+        self.workAddressEntryVar.set("null")
         self.workAddressEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.workAddressEntryVar)
         self.workAddressEntry.grid(row=5, column=1)
 
@@ -245,8 +245,8 @@ class AddFile:
 
         #initially invoking search funtion
         self.refresh()
-        self.customerRequestBox.selection_set(0)
-        self.customerRequestBox.focus(0)
+        self.customerRequestBox.selection_set(0) if(self.dataList!=[]) else 0
+        self.customerRequestBox.focus(0) if(self.dataList!=[]) else 0
         self.dynamicDetails(None)
     #it will display data in listbox according to the search query
     
@@ -322,7 +322,7 @@ class AddFile:
     #refresh button replenis new data in self.data and renews items in listbox of Request
     def refresh(self):
         #reading the all data of Request from database
-        RequestData = Request().whereData(status=1)
+        RequestData = Request().whereData(status="1")
 
         customerObject = Customer()
         self.dataList = []
@@ -335,14 +335,14 @@ class AddFile:
 
         self.searchEntry.delete(0, "end")
         self.search(None)
-        self.customerRequestBox.selection_set(0)
-        self.customerRequestBox.focus(0)
+        self.customerRequestBox.selection_set(0) if(self.dataList!=[]) else 0
+        self.customerRequestBox.focus(0) if(self.dataList!=[]) else 0
         self.dynamicDetails(None)
-
         
         #now restarting the dynamic details 
-        self.customerRequestBox.selection_set(0)
+        self.customerRequestBox.selection_set(0) if(self.dataList!=[]) else 0
         self.dynamicDetails(None)
+        self.cancelMethod()
     
     #method to change page dynamically
     def changePage(self, index):
@@ -388,11 +388,11 @@ class AddFile:
                             timePeriod=self.pagesList[4].loanPeriodVar.get()
                             emiAmount=self.pagesList[4].installmentAmtVar.get()
                             numOfEmi = self.pagesList[4].numOfEmiVar.get()
-                            dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"-"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"-"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
+                            dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
 
-                            insertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get(), dateApproved=dateApproved, loanType="Loan on vehicles")
+                            insertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
 
-                            fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)
+                            fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
 
                             guarranterObject = Guarranter()
                             guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), photo=self.pagesList[1].photoPath, status=1)
@@ -409,24 +409,20 @@ class AddFile:
                             documentObject.insertData(customer_id=customerId, doc_name="rc", required=self.pagesList[3].rcReqVar.get(), verified=self.pagesList[3].rcVerifyVar.get(), file_id=fileId, status=self.pagesList[3].rcVerifyVar.get())
 
                             vehicleObject = Vehicle()
-                            vehicleObject.insertData(customerId=customerId, name=self.pagesList[2].vNameVar.get(), plateNum=self.pagesList[2].numberPlateVar.get(), model=self.pagesList[2].modelVar.get(), manufacturer=self.pagesList[2].manufacturerVar.get(), note="sud", fuel=self.pagesList[2].fuelUsedVar.get(), engineCC=self.pagesList[2].engineCCVar.get(), horsePowerBHP=self.pagesList[2].horsePowerVar.get(), cyilenders=self.pagesList[2].numCyilendersVar.get() ,fuelCapacity=self.pagesList[2].fuelCapacityVar.get() ,seatingCapacity=self.pagesList[2].seatingCapacityVar.get(), vehicleWeightKG=self.pagesList[2].vehicleWeightVar.get(), status=1, condition="fine")
+                            vehicleObject.insertData(customerId=customerId, name=self.pagesList[2].vNameVar.get(), plateNum=self.pagesList[2].numberPlateVar.get(), model=self.pagesList[2].modelVar.get(), manufacturer=self.pagesList[2].manufacturerVar.get(), note="sud", fuel=self.pagesList[2].fuelUsedVar.get(), engineCC=self.pagesList[2].engineCCVar.get(), horsePowerBHP=self.pagesList[2].horsePowerVar.get(), cyilenders=self.pagesList[2].numCyilendersVar.get() ,fuelCapacity=self.pagesList[2].fuelCapacityVar.get() ,seatingCapacity=self.pagesList[2].seatingCapacityVar.get(), vehicleWeightKG=self.pagesList[2].vehicleWeightVar.get(), status=1, currentCondition="fine")
 
                             ledgerObject = Ledger()
                             itemIids =  self.pagesList[4].table.get_children()
                             for iid in itemIids:
                                 values = self.pagesList[4].table.item(iid, "values")
-                                ledgerObject.insertData(customerId=customerId, fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
-
-                            insertSuccessfully=False
+                                ledgerObject.insertData(fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
                             
                             if(insertSuccessfully):
-                                fileObject.updateData()
                                 print("loanPassed")
                                 RequestObject = Request()
                                 id=RequestObject.whereData(customer_id=customerId)[0][0]
                                 RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
-                                self.cancelMethod()
                                 self.refresh()
                             else:
                                 print("unsuccessfull")
@@ -504,6 +500,8 @@ class AddFile:
         self.pagesList[3].initialStage()
         self.pagesList[4].initialStage()
         self.pagesList[0].ok=False
+        if(not self.dataList):
+            self.pagesList[0].disable()
 
         self.changePage(0)
         self.updateStatus()
@@ -619,6 +617,7 @@ class ApprovalPage:
         self.guarranterCheckVar.set(0)
         self.loanCheckVar.set(0)
         self.enableEntries()
+        self.ok=False
         self.checkData()
 
 class GuarrantersPage:
@@ -884,6 +883,7 @@ class GuarrantersPage:
     
     def initialStage(self):
         self.enable()
+        self.ok=False
         self.gNameEntry.delete(0, END)
         self.aadharEntry.delete(0, END)
         self.fNameEntry.delete(0, END)
@@ -1059,6 +1059,7 @@ class DocVerifyPage:
         self.chequeVerifyVar.set(0)
         self.stampReqVar.set(0)
         self.stampVerifyVar.set(0)
+        self.ok=False
         self.mobileReqVar.set(0)
         self.mobileVerifyVar.set(0)
         self.rcReqVar.set(0)
@@ -1175,7 +1176,7 @@ class VehiclesPage:
         if(not self.modelVar.get()):
             requirementsFilled=False
             instructionText = "Model field is necessary"
-        elif(not self.manufaturerVar.get()):
+        elif(not self.manufacturerVar.get()):
             requirementsFilled=False
             instructionText = "Manufacturer field is necessary"
         elif(not self.numberPlateVar.get()):
@@ -1200,7 +1201,7 @@ class VehiclesPage:
             self.numberPlateEntry.config(state="disable")
             self.operationButton.config(state="disable")
 
-            self.vehicle = [self.modelVar.get(), self.manufaturerVar.get(), self.fuelUsedEntry.get(), self.engineCCVar.get(), self.horsePowerVar.get(), self.numCyilendersVar.get(), self.fuelCapacityVar.get(), self.seatingCapacityVar.get(), self.vehicleWeightVar.get()]
+            self.vehicle = [self.modelVar.get(), self.manufacturerVar.get(), self.fuelUsedEntry.get(), self.engineCCVar.get(), self.horsePowerVar.get(), self.numCyilendersVar.get(), self.fuelCapacityVar.get(), self.seatingCapacityVar.get(), self.vehicleWeightVar.get()]
             self.ok = True
 
             self.updateStatus()
@@ -1246,6 +1247,7 @@ class VehiclesPage:
 
     def initialStage(self):
         self.enable()
+        self.ok=False
         self.modelEntry.delete(0, END)
         self.vNameEntry.delete(0, END)
         self.manufacturerEntry.delete(0, END)
@@ -1255,6 +1257,7 @@ class VehiclesPage:
         self.numCyilendersEntry.delete(0, END)
         self.fuelCapacityEntry.delete(0, END)
         self.seatingCapacityEntry.delete(0, END)
+        self.instructionLabel.config(text="")
         self.vehicleWeightEntry.delete(0, END)
         self.numberPlateEntry.delete(0, END)
         self.disable()
@@ -1334,7 +1337,7 @@ class finalPage:
 
 
         #updating root after creating this many widgets and configurations
-        root.update()
+        pageWindow.update()
 
         #event handler for amountApprovedEntry to restrict user from entering letters, character
         def amountApprovedEntryEventHandler(event):

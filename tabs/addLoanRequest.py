@@ -3,9 +3,9 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 from sys import path
 path.append(r"D:\projects\finoshok\finoshok\model")
-#now we can import Customer and Requests class successfully from customer model and Rewusts model respectively
+#now we can import Customer and Request class successfully from customer model and Rewusts model respectively
 from Customer import Customer
-from Request import Requests
+from Request import Request
 from tkinter.messagebox import showinfo
 
 #AddFile class needs a parameter either a tk window or frame
@@ -153,7 +153,7 @@ class AddLoanRequest:
         #saving details only if requirementsFilled is true and self.customerId is defined
         if(requirementsFilled and self.customerId):
             #creating a requests object to insert data
-            obj = Requests()
+            obj = Request()
             #result true means successfull insertion and false meanse unsuccessfull insertion
             result = obj.insertData(customer_id = self.customerId, requested_amount = self.loanVar.get(), purpose=self.purposeVar.get(), date = self.dateOfRequestEntry.get())
             

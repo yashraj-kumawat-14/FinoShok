@@ -10,6 +10,7 @@ from databaseConfig import HOSTNAME, USER, PASSWORD, DATABASE
 
 class Database:
     def fetchData(self, query):
+        print(query)
         #making connection with database
         conn = mysql.connector.connect(host=HOSTNAME, user=USER, password=PASSWORD, database=DATABASE)
 
@@ -33,6 +34,7 @@ class Database:
             return False
     
     def dataModify(self, query):
+        print(query)
         #making connection with database
         conn = mysql.connector.connect(host=HOSTNAME, user=USER, password=PASSWORD, database=DATABASE)
 

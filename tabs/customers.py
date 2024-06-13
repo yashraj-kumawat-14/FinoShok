@@ -147,14 +147,17 @@ class Customers:
 
         #creating labels dynamic
         self.customerEntryVar = StringVar()
+        self.customerEntryVar.set("null")
         customerEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.customerEntryVar)
         customerEntry.grid(row=0, column=1)
 
         self.aadharEntryVar = StringVar()
+        self.aadharEntryVar.set("null")
         aadharEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.aadharEntryVar)
         aadharEntry.grid(row=1, column=1)
 
         self.mobileEntryVar = StringVar()
+        self.mobileEntryVar.set("null")
         mobileEntry = Entry(detailsInnerFrame, state="readonly", textvariable=self.mobileEntryVar)
         mobileEntry.grid(row=2, column=1)
         
@@ -164,8 +167,8 @@ class Customers:
 
         #initially invoking search funtion
         self.refresh()
-        self.customerListBox.selection_set(0)
-        self.customerListBox.focus(0)
+        self.customerListBox.selection_set(0) if(self.dataList) else 0
+        self.customerListBox.focus(0) if(self.dataList) else 0
         self.dynamicDetails(None)
     
     #it will display data in listbox according to the search query
@@ -246,8 +249,8 @@ class Customers:
 
         self.searchEntry.delete(0, 'end')
         self.search(None)
-        self.customerListBox.selection_set(0)
-        self.customerListBox.focus(0)
+        self.customerListBox.selection_set(0) if(self.dataList) else 0
+        self.customerListBox.focus(0) if(self.dataList) else 0
         self.dynamicDetails(None)
 
 

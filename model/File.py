@@ -9,4 +9,4 @@ class File(Model):
     #setting the tablename to customers to work with only customers table
     fillable=["customerId", "loanAmount", "interest", "timePeriod", "status", "emiAmount", "numEmi", "note", "guarranterId", "dateApproved", 'loanType']
     
-    tableName="file"
+    tableName="files"

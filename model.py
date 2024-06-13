@@ -151,8 +151,10 @@ class Model:
         #FORMATED STRING
         formattedString = ""
         for i in range(len(data)):
-            formattedString+= columns[i]+"="+values[i]
-            
+            formattedString+= columns[i]+"="+values[i]+"and"
+
+        formattedString=formattedString.rstrip("and") 
+
         #creating a database object
         object = Database()
 
