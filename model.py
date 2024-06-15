@@ -114,7 +114,7 @@ class Model:
             tempValues = list(data.values())
 
             for value in tempValues:
-                values.append("'"+value+"'")
+                values.append("'"+str(value)+"'")
 
             #FORMATED STRING
             formattedString = ""

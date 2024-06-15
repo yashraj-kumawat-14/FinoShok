@@ -4,9 +4,10 @@ from tkinter.filedialog import askopenfilename
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 from sys import path
+import shutil
 path.append(r"D:\projects\finoshok\finoshok\model")
 path.append(r"D:\projects\finoshok\finoshok\config")
-from pathConfig import CUSTOMERPHOTOPATH
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH
 #now we can import Customer and Request class successfully from customer model and Rewusts model respectively
 from Customer import Customer
 from File import File
@@ -239,7 +240,7 @@ class AddFile:
         self.workAddressEntry = Entry(self.detailsInnerFrame, state="readonly", textvariable=self.workAddressEntryVar)
         self.workAddressEntry.grid(row=5, column=1)
 
-        self.purposeEntry = Text(self.customerDetailsFrame, width=40, height=10)
+        self.purposeEntry = Text(self.customerDetailsFrame, width=40, height=10, state="disabled")
         self.purposeEntry.grid(row=1, column=1)
         #self.section3 workd ends----
 
@@ -318,7 +319,16 @@ class AddFile:
             
             #performing cancel method
             self.cancelMethod()
-    
+        else:
+            self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+            img=Image.open(self.photoPath)
+                
+            #resizing the image
+            img=img.resize((82,120))
+
+            #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+            self.customerPhoto = ImageTk.PhotoImage(img)
+            self.customerPhotoLabel.config(image=self.customerPhoto)
     #refresh button replenis new data in self.data and renews items in listbox of Request
     def refresh(self):
         #reading the all data of Request from database
@@ -390,12 +400,21 @@ class AddFile:
                             numOfEmi = self.pagesList[4].numOfEmiVar.get()
                             dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
 
-                            insertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
 
                             fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
 
                             guarranterObject = Guarranter()
-                            guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), photo=self.pagesList[1].photoPath, status=1)
+
+                            guarranterInsertSuccessfully=guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), status=1)
+
+            
+                            guarranterId=guarranterObject.whereData(aadhar=self.pagesList[1].aadharVar.get())[0][0]
+                            fileObject.updateData(id=fileId, guarranterId=guarranterId)
+
+
+                            if(self.photoPath):
+                                shutil.copy(self.photoPath, f"{GUARRANTERPHOTOPATH}\\{guarranterId}.jpg")
 
                             documentObject = Document()
                             documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())
@@ -409,7 +428,7 @@ class AddFile:
                             documentObject.insertData(customer_id=customerId, doc_name="rc", required=self.pagesList[3].rcReqVar.get(), verified=self.pagesList[3].rcVerifyVar.get(), file_id=fileId, status=self.pagesList[3].rcVerifyVar.get())
 
                             vehicleObject = Vehicle()
-                            vehicleObject.insertData(customerId=customerId, name=self.pagesList[2].vNameVar.get(), plateNum=self.pagesList[2].numberPlateVar.get(), model=self.pagesList[2].modelVar.get(), manufacturer=self.pagesList[2].manufacturerVar.get(), note="sud", fuel=self.pagesList[2].fuelUsedVar.get(), engineCC=self.pagesList[2].engineCCVar.get(), horsePowerBHP=self.pagesList[2].horsePowerVar.get(), cyilenders=self.pagesList[2].numCyilendersVar.get() ,fuelCapacity=self.pagesList[2].fuelCapacityVar.get() ,seatingCapacity=self.pagesList[2].seatingCapacityVar.get(), vehicleWeightKG=self.pagesList[2].vehicleWeightVar.get(), status=1, currentCondition="fine")
+                            vehicleInsertSuccessfully=vehicleObject.insertData(customerId=customerId, name=self.pagesList[2].vNameVar.get(), plateNum=self.pagesList[2].numberPlateVar.get(), model=self.pagesList[2].modelVar.get(), manufacturer=self.pagesList[2].manufacturerVar.get(), note="sud", fuel=self.pagesList[2].fuelUsedVar.get(), engineCC=self.pagesList[2].engineCCVar.get(), horsePowerBHP=self.pagesList[2].horsePowerVar.get(), cyilenders=self.pagesList[2].numCyilendersVar.get() ,fuelCapacity=self.pagesList[2].fuelCapacityVar.get() ,seatingCapacity=self.pagesList[2].seatingCapacityVar.get(), vehicleWeightKG=self.pagesList[2].vehicleWeightVar.get(), status=1, currentCondition="fine", fileId=fileId)
 
                             ledgerObject = Ledger()
                             itemIids =  self.pagesList[4].table.get_children()
@@ -417,15 +436,27 @@ class AddFile:
                                 values = self.pagesList[4].table.item(iid, "values")
                                 ledgerObject.insertData(fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
                             
-                            if(insertSuccessfully):
-                                print("loanPassed")
+                            if(fileInsertSuccessfully):
                                 RequestObject = Request()
                                 id=RequestObject.whereData(customer_id=customerId)[0][0]
                                 RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
                                 self.refresh()
                             else:
-                                print("unsuccessfull")
+                                if(vehicleInsertSuccessfully):
+                                    vehicleId = vehicleObject.whereData(fileId=fileId)[0][0]
+                                    vehicleObject.deleteRow(id=vehicleId)
+                                ledgerIds = ledgerObject.whereData(fileId=fileId)
+                                for idrow in ledgerIds:
+                                    ledgerObject.deleteRow(id=idrow[0])
+                                documentIds = documentObject.whereData(fileId=fileId)
+                                for idrow in documentIds:
+                                    documentObject.deleteRow(id=idrow[0])
+                                if(guarranterInsertSuccessfully):
+                                    guarranterId = fileObject.whereData(fileId=fileId)[0][10]
+                                    guarranterObject.deleteRow(guarranterId)
+                                
+                                message.showerror("Error", f"please contact developer for \nmore details")
                         else:
                             self.changePage(3)
                     else:
@@ -440,7 +471,59 @@ class AddFile:
                 elif(self.pagesList[0].guarranterCheckVar.get()==1 and self.pagesList[0].typeOfLoanEntry.get()=="Personal Loan"):
                     if(self.pagesList[1].ok):
                         if(self.pagesList[3].ok):
-                            pass
+                            customerObject = Customer()
+                            customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
+
+                            fileObject = File()
+                            loanAmount=self.pagesList[4].amountApprovedVar.get()
+                            interest=self.pagesList[4].interestVar.get()
+                            timePeriod=self.pagesList[4].loanPeriodVar.get()
+                            emiAmount=self.pagesList[4].installmentAmtVar.get()
+                            numOfEmi = self.pagesList[4].numOfEmiVar.get()
+                            dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
+
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+
+                            fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
+
+                            guarranterObject = Guarranter()
+                            guarranterInsertSuccessfully=guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), photo=self.pagesList[1].photoPath, status=1)
+
+                            documentObject = Document()
+                            documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="pancard", required=self.pagesList[3].pancardReqVar.get(), verified=self.pagesList[3].pancardVerifyVar.get(), file_id=fileId, status=self.pagesList[3].pancardVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="cheque", required=self.pagesList[3].chequeReqVar.get(), verified=self.pagesList[3].chequeVerifyVar.get(), file_id=fileId, status=self.pagesList[3].chequeVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="stamp", required=self.pagesList[3].stampReqVar.get(), verified=self.pagesList[3].stampVerifyVar.get(), file_id=fileId, status=self.pagesList[3].stampVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="rc", required=self.pagesList[3].rcReqVar.get(), verified=self.pagesList[3].rcVerifyVar.get(), file_id=fileId, status=self.pagesList[3].rcVerifyVar.get())
+
+                            ledgerObject = Ledger()
+                            itemIids =  self.pagesList[4].table.get_children()
+                            for iid in itemIids:
+                                values = self.pagesList[4].table.item(iid, "values")
+                                ledgerObject.insertData(fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
+                            
+                            if(fileInsertSuccessfully):
+                                RequestObject = Request()
+                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                RequestObject.updateData(id=id, status="0")
+                                message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
+                                self.refresh()
+                            else:
+                                ledgerIds = ledgerObject.whereData(fileId=fileId)
+                                for idrow in ledgerIds:
+                                    ledgerObject.deleteRow(id=idrow[0])
+                                documentIds = documentObject.whereData(fileId=fileId)
+                                for idrow in documentIds:
+                                    documentObject.deleteRow(id=idrow[0])
+                                if(guarranterInsertSuccessfully):
+                                    guarranterId = fileObject.whereData(fileId=fileId)[0][10]
+                                    guarranterObject.deleteRow(guarranterId)
+                                
+                                message.showerror("Error", f"please contact developer for \nmore details")
                         else:
                             self.changePage(3)
                     else:
@@ -451,7 +534,59 @@ class AddFile:
                 elif(self.pagesList[0].typeOfLoanEntry.get() == "Loan on vehicle" and not self.pagesList[0].guarranterCheckVar.get()):
                     if(self.pagesList[2].ok):
                         if(self.pagesList[3].ok):
-                            pass
+                            customerObject = Customer()
+                            customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
+
+                            fileObject = File()
+                            loanAmount=self.pagesList[4].amountApprovedVar.get()
+                            interest=self.pagesList[4].interestVar.get()
+                            timePeriod=self.pagesList[4].loanPeriodVar.get()
+                            emiAmount=self.pagesList[4].installmentAmtVar.get()
+                            numOfEmi = self.pagesList[4].numOfEmiVar.get()
+                            dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
+
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+
+                            fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
+
+                            documentObject = Document()
+                            documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="pancard", required=self.pagesList[3].pancardReqVar.get(), verified=self.pagesList[3].pancardVerifyVar.get(), file_id=fileId, status=self.pagesList[3].pancardVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="cheque", required=self.pagesList[3].chequeReqVar.get(), verified=self.pagesList[3].chequeVerifyVar.get(), file_id=fileId, status=self.pagesList[3].chequeVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="stamp", required=self.pagesList[3].stampReqVar.get(), verified=self.pagesList[3].stampVerifyVar.get(), file_id=fileId, status=self.pagesList[3].stampVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="rc", required=self.pagesList[3].rcReqVar.get(), verified=self.pagesList[3].rcVerifyVar.get(), file_id=fileId, status=self.pagesList[3].rcVerifyVar.get())
+
+                            vehicleObject = Vehicle()
+                            vehicleInsertSuccessfully=vehicleObject.insertData(customerId=customerId, name=self.pagesList[2].vNameVar.get(), plateNum=self.pagesList[2].numberPlateVar.get(), model=self.pagesList[2].modelVar.get(), manufacturer=self.pagesList[2].manufacturerVar.get(), note="sud", fuel=self.pagesList[2].fuelUsedVar.get(), engineCC=self.pagesList[2].engineCCVar.get(), horsePowerBHP=self.pagesList[2].horsePowerVar.get(), cyilenders=self.pagesList[2].numCyilendersVar.get() ,fuelCapacity=self.pagesList[2].fuelCapacityVar.get() ,seatingCapacity=self.pagesList[2].seatingCapacityVar.get(), vehicleWeightKG=self.pagesList[2].vehicleWeightVar.get(), status=1, currentCondition="fine")
+
+                            ledgerObject = Ledger()
+                            itemIids =  self.pagesList[4].table.get_children()
+                            for iid in itemIids:
+                                values = self.pagesList[4].table.item(iid, "values")
+                                ledgerObject.insertData(fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
+                            
+                            if(fileInsertSuccessfully):
+                                RequestObject = Request()
+                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                RequestObject.updateData(id=id, status="0")
+                                message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
+                                self.refresh()
+                            else:
+                                if(vehicleInsertSuccessfully):
+                                    vehicleId = vehicleObject.whereData(fileId=fileId)[0][0]
+                                    vehicleObject.deleteRow(id=vehicleId)
+                                ledgerIds = ledgerObject.whereData(fileId=fileId)
+                                for idrow in ledgerIds:
+                                    ledgerObject.deleteRow(id=idrow[0])
+                                documentIds = documentObject.whereData(fileId=fileId)
+                                for idrow in documentIds:
+                                    documentObject.deleteRow(id=idrow[0])
+
+                                message.showerror("Error", f"please contact developer for \nmore details")
                         else:
                             self.changePage(3)
                     else:
@@ -462,13 +597,111 @@ class AddFile:
                 
                 elif(self.pagesList[0].typeOfLoanEntry.get() == "Personal Loan" and not self.pagesList[0].guarranterCheckVar.get()):
                     if(self.pagesList[3].ok):
-                            pass
+                            customerObject = Customer()
+                            customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
+
+                            fileObject = File()
+                            loanAmount=self.pagesList[4].amountApprovedVar.get()
+                            interest=self.pagesList[4].interestVar.get()
+                            timePeriod=self.pagesList[4].loanPeriodVar.get()
+                            emiAmount=self.pagesList[4].installmentAmtVar.get()
+                            numOfEmi = self.pagesList[4].numOfEmiVar.get()
+                            dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
+
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+
+                            fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
+
+                            documentObject = Document()
+                            documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="pancard", required=self.pagesList[3].pancardReqVar.get(), verified=self.pagesList[3].pancardVerifyVar.get(), file_id=fileId, status=self.pagesList[3].pancardVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="cheque", required=self.pagesList[3].chequeReqVar.get(), verified=self.pagesList[3].chequeVerifyVar.get(), file_id=fileId, status=self.pagesList[3].chequeVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="stamp", required=self.pagesList[3].stampReqVar.get(), verified=self.pagesList[3].stampVerifyVar.get(), file_id=fileId, status=self.pagesList[3].stampVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="rc", required=self.pagesList[3].rcReqVar.get(), verified=self.pagesList[3].rcVerifyVar.get(), file_id=fileId, status=self.pagesList[3].rcVerifyVar.get())
+
+                            ledgerObject = Ledger()
+                            itemIids =  self.pagesList[4].table.get_children()
+                            for iid in itemIids:
+                                values = self.pagesList[4].table.item(iid, "values")
+                                ledgerObject.insertData(fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
+                            
+                            if(fileInsertSuccessfully):
+                                RequestObject = Request()
+                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                RequestObject.updateData(id=id, status="0")
+                                message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
+                                self.refresh()
+                            else:
+                                ledgerIds = ledgerObject.whereData(fileId=fileId)
+                                for idrow in ledgerIds:
+                                    ledgerObject.deleteRow(id=idrow[0])
+                                documentIds = documentObject.whereData(fileId=fileId)
+                                for idrow in documentIds:
+                                    documentObject.deleteRow(id=idrow[0])
+                                
+                                message.showerror("Error", f"please contact developer for \nmore details")
                     else:
                         self.changePage(3)
                 elif(self.pagesList[0].typeOfLoanEntry.get() == "Personal Loan" and self.pagesList[0].guarranterCheckVar.get()):
                     if(self.pagesList[1].ok):
                         if(self.pagesList[3].ok):
-                            pass
+                            customerObject = Customer()
+                            customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
+
+                            fileObject = File()
+                            loanAmount=self.pagesList[4].amountApprovedVar.get()
+                            interest=self.pagesList[4].interestVar.get()
+                            timePeriod=self.pagesList[4].loanPeriodVar.get()
+                            emiAmount=self.pagesList[4].installmentAmtVar.get()
+                            numOfEmi = self.pagesList[4].numOfEmiVar.get()
+                            dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
+
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+
+                            fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
+
+                            guarranterObject = Guarranter()
+                            guarranterInsertSuccessfully=guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), photo=self.pagesList[1].photoPath, status=1)
+
+                            documentObject = Document()
+                            documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="pancard", required=self.pagesList[3].pancardReqVar.get(), verified=self.pagesList[3].pancardVerifyVar.get(), file_id=fileId, status=self.pagesList[3].pancardVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="cheque", required=self.pagesList[3].chequeReqVar.get(), verified=self.pagesList[3].chequeVerifyVar.get(), file_id=fileId, status=self.pagesList[3].chequeVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="stamp", required=self.pagesList[3].stampReqVar.get(), verified=self.pagesList[3].stampVerifyVar.get(), file_id=fileId, status=self.pagesList[3].stampVerifyVar.get())
+
+                            documentObject.insertData(customer_id=customerId, doc_name="rc", required=self.pagesList[3].rcReqVar.get(), verified=self.pagesList[3].rcVerifyVar.get(), file_id=fileId, status=self.pagesList[3].rcVerifyVar.get())
+
+                            ledgerObject = Ledger()
+                            itemIids =  self.pagesList[4].table.get_children()
+                            for iid in itemIids:
+                                values = self.pagesList[4].table.item(iid, "values")
+                                ledgerObject.insertData(fileId=fileId, emiNumber=values[0], status=0, emiDate=values[1], emiAmount=values[2], note="sud")
+                            
+                            if(fileInsertSuccessfully):
+                                RequestObject = Request()
+                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                RequestObject.updateData(id=id, status="0")
+                                message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
+                                self.refresh()
+                            else:
+                                ledgerIds = ledgerObject.whereData(fileId=fileId)
+                                for idrow in ledgerIds:
+                                    ledgerObject.deleteRow(id=idrow[0])
+                                documentIds = documentObject.whereData(fileId=fileId)
+                                for idrow in documentIds:
+                                    documentObject.deleteRow(id=idrow[0])
+                                if(guarranterInsertSuccessfully):
+                                    guarranterId = fileObject.whereData(fileId=fileId)[0][10]
+                                    guarranterObject.deleteRow(guarranterId)
+                                
+                                message.showerror("Error", f"please contact developer for \nmore details")
                         else:
                             self.changePage(3)
                     else:

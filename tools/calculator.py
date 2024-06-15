@@ -19,7 +19,7 @@ class Calculator:
         self.result=""
 
         #creating containers  and other necessary frames
-        container = Frame(calcWindow, bg="grey", width=230, height=300)
+        container = Frame(self.tempCalcWindow, bg="grey", width=230, height=300)
         container.pack(fill=BOTH, expand=1)
         container.pack_propagate(0) #By setting pack_propagate(1), the frame maintains its specified size (width and height), and it does not automatically adjust to fit its child widgets.
         
