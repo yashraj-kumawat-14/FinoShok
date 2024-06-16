@@ -233,10 +233,14 @@ class AddCustomer:
                     #if customer data inserted succesfully then only proceed
                     if(insertSuccessfully):
                         #adding customer's photo to assets if photoPath exists
+                        print(self.photoPath, "first")
                         if(self.photoPath):
                             #saving image as customerId.jpg
+                            print(self.photoPath, "second")
                             customerId = customerObject.whereData(aadhar=self.aadharEntry.get())[0][0]
                             shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{customerId}.jpg")
+                            print(self.photoPath, "third")
+                            
 
                         #instructing user that all things are carried out successfully
                         instructionText=f"{cNameEntry.get()} added to database successfully"
@@ -251,7 +255,9 @@ class AddCustomer:
                         #setting value of self.customerPhto to None
                         self.customerPhoto=None
                         #destroying the the label if it was created else do nonthing and return false value
-                        self.customerPhotoLabel.destroy() if(self.photoPath) else False
+                        self.customerPhotoLabel.destroy() if(self.photoPath) else None
+                        print(self.photoPath, "fourth")
+                        self.photoPath=None
                         
                         #changing the photbutton text
                         photoSelectButton.config(text="select")

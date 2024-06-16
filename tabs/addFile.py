@@ -438,7 +438,7 @@ class AddFile:
                             
                             if(fileInsertSuccessfully):
                                 RequestObject = Request()
-                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                id=RequestObject.whereData(customer_id=customerId, date=self.customerRequestBox.item(self.customerRequestBox.selection()[0], "values")[4])[0][0]
                                 RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
                                 self.refresh()
@@ -508,7 +508,7 @@ class AddFile:
                             
                             if(fileInsertSuccessfully):
                                 RequestObject = Request()
-                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                id=RequestObject.whereData(customer_id=customerId, date=self.customerRequestBox.item(self.customerRequestBox.selection()[0], "values")[4])[0][0]
                                 RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
                                 self.refresh()
@@ -571,7 +571,7 @@ class AddFile:
                             
                             if(fileInsertSuccessfully):
                                 RequestObject = Request()
-                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                id=RequestObject.whereData(customer_id=customerId, date=self.customerRequestBox.item(self.customerRequestBox.selection()[0], "values")[4])[0][0]
                                 RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
                                 self.refresh()
@@ -631,7 +631,7 @@ class AddFile:
                             
                             if(fileInsertSuccessfully):
                                 RequestObject = Request()
-                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                id=RequestObject.whereData(customer_id=customerId, date=self.customerRequestBox.item(self.customerRequestBox.selection()[0], "values")[4])[0][0]
                                 RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
                                 self.refresh()
@@ -686,7 +686,7 @@ class AddFile:
                             
                             if(fileInsertSuccessfully):
                                 RequestObject = Request()
-                                id=RequestObject.whereData(customer_id=customerId)[0][0]
+                                id=RequestObject.whereData(customer_id=customerId, date=self.customerRequestBox.item(self.customerRequestBox.selection()[0], "values")[4])[0][0]
                                 RequestObject.updateData(id=id, status="0")
                                 message.showinfo("Loan Passed Successfully", f"Loan Passed successfully for {self.customerEntryVar.get()}")
                                 self.refresh()

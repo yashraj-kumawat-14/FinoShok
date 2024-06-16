@@ -230,7 +230,7 @@ class Profile:
         self.viewLedgerButton = Button(self.fileDetailsFrameInner, text="View Ledger", bg='light green')
         self.viewLedgerButton.grid(row=8, column=0, columnspan=2, sticky="we", pady=2)
 
-        self.deleteFileButton = Button(self.fileDetailsFrameInner, text="Delete File ", bg="red")
+        self.deleteFileButton = Button(self.fileDetailsFrameInner, text="Delete File ", bg="red", command=self.deleteFile)
         self.deleteFileButton.grid(row=8, column=2, pady=2, padx=2)
 
         #fileDetails frame work ends here
@@ -321,8 +321,14 @@ class Profile:
         self.rcVerifyCheck = Checkbutton(self.documentsFrameInner, variable=self.rcVerifyVar)
         self.rcVerifyCheck.grid(row=6, column=2)
 
-        self.editDocumentsButton = Button(self.documentsFrameInner, text=' Edit ')
-        self.editDocumentsButton.grid(row=7, column=0, sticky="ew", columnspan=3)
+        self.editDocumentsButton = Button(self.documentsFrameInner, text=' Edit ', command=self.enableDocument)
+        self.editDocumentsButton.grid(row=7, column=0, sticky="ew")
+
+        self.cancelDocumentsButton = Button(self.documentsFrameInner, text=' Cancel ', command=self.documentDetailsController)
+        self.cancelDocumentsButton.grid(row=7, column=1, sticky="ew")
+
+        self.saveDocumentsButton = Button(self.documentsFrameInner, text=' Save ', command=self.saveDocument)
+        self.saveDocumentsButton.grid(row=7, column=2, sticky="ew")
 
         #documentFrame work ends here
 
@@ -438,9 +444,115 @@ class Profile:
         self.guarranterDetailsFrameController()
         self.vehicleDetailsFrameController()
         self.filePageController()
+        self.documentDetailsController()
         #work of vehicledetailsframe ends here
 
         #work of guarranterframe starts here 
+
+    
+        
+    def enableDocument(self):
+        self.aadharReqCheck.config(state="normal")
+        self.aadharVerifyCheck.config(state="normal")
+        self.pancardReqCheck.config(state="normal")
+        self.pancardVerifyCheck.config(state="normal")
+        self.chequeReqCheck.config(state="normal")
+        self.chequeVerifyCheck.config(state="normal")
+        self.stampReqCheck.config(state="normal")
+        self.stampVerifyCheck.config(state="normal")   
+        self.rcReqCheck.config(state="normal")
+        self.rcVerifyCheck.config(state="normal")
+        self.editDocumentsButton.config(state="disabled")
+        self.cancelDocumentsButton.config(state="normal")
+        self.saveDocumentsButton.config(state="normal")
+
+    def saveDocument(self):
+        sure = message.askyesno("Are you sure ?", "Are you sure to overwrite \nthe document details ?")
+        if(sure):
+            for item in self.documentData:
+                if("aadhar" in item):
+                    self.documentObject.updateData(id=item[0], required=int(self.aadharReqVar.get()), verified=int(self.aadharVerifyVar.get()))
+
+                if("pancard" in item):
+                    self.documentObject.updateData(id=item[0], required=int(self.pancardReqVar.get()), verified=int(self.pancardVerifyVar.get()))
+
+                if("cheque" in item):
+                    self.documentObject.updateData(id=item[0], required=int(self.chequeReqVar.get()), verified=int(self.chequeVerifyVar.get()))
+
+                if("stamp" in item):
+                    self.documentObject.updateData(id=item[0], required=int(self.stampReqVar.get()), verified=int(self.stampVerifyVar.get()))
+
+                if("rc" in item):
+                    self.documentObject.updateData(id=item[0], required=int(self.rcReqVar.get()), verified=int(self.rcVerifyVar.get()))
+
+            self.documentDetailsController()   
+
+    def documentDetailsController(self):
+        self.documentData = self.documentObject.whereData(file_Id=self.fileId)
+        for item in self.documentData:
+
+            if("aadhar" in item):
+                self.aadharReqVar.set(item[7])
+                self.aadharVerifyVar.set(item[8])
+                
+            if("pancard" in item):
+                self.pancardReqVar.set(item[7])
+                self.pancardVerifyVar.set(item[8])
+                
+            if("cheque" in item):
+                self.chequeReqVar.set(item[7])
+                self.chequeVerifyVar.set(item[8])
+                
+            if("stamp" in item):
+                self.stampReqVar.set(item[7])
+                self.stampVerifyVar.set(item[8])
+                
+            if("rc" in item):
+                self.rcReqVar.set(item[7])
+                self.rcVerifyVar.set(item[8])
+
+        if(not self.documentData):
+            self.aadharReqVar.set(0)
+            self.aadharVerifyVar.set(0)
+            self.stampReqVar.set(0)
+            self.stampVerifyVar.set(0)
+            self.rcReqVar.set(0)
+            self.rcVerifyVar.set(0)
+            self.chequeReqVar.set(0)
+            self.chequeVerifyVar.set(0)
+            self.pancardReqVar.set(0)
+            self.pancardVerifyVar.set(0)
+            
+        self.disableDocument()       
+        self.editDocumentsButton.config(state="normal")if(self.customerId and self.fileId)else self.editDocumentsButton.config(state="disabled")
+        self.cancelDocumentsButton.config(state="disabled")
+        self.saveDocumentsButton.config(state="disabled")
+
+    def disableDocument(self):
+        self.aadharReqCheck.config(state="disable")
+        self.aadharVerifyCheck.config(state="disable")
+        self.rcReqCheck.config(state="disable")
+        self.rcVerifyCheck.config(state="disable")
+        self.stampReqCheck.config(state="disable")
+        self.stampVerifyCheck.config(state="disable")
+        self.chequeReqCheck.config(state="disable")
+        self.chequeVerifyCheck.config(state="disable")
+        self.pancardReqCheck.config(state="disable")
+        self.pancardVerifyCheck.config(state="disable")
+    
+    def refresh(self):
+        self.filesData = self.fileObject.whereData(customerId=self.customerId)
+        self.filesTable.delete(*self.filesTable.get_children())
+        lengthFile = len(self.filesData)
+        for i in range(lengthFile):
+            self.filesTable.insert(parent="", text="", iid=i+1, index="end", values=(str(i+1)+".", self.filesData[i][9], self.filesData[i][2], self.filesData[i][11], "active"if (self.filesData[i][5]==1) else 'inactive'))
+        
+        self.guarranterDetailsFrameController()
+        self.vehicleDetailsFrameController()
+        self.filePageController()
+        self.documentDetailsController()
+
+
     def guarranterDetailsFrameController(self):
         
         #first things is to delete all the widgets present in self.detailsFrame
@@ -449,8 +561,9 @@ class Profile:
         for child in children:
             child.destroy()
 
-        self.customerId = self.customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
-        self.dateApproved = self.filesTable.item(self.filesTable.selection()[0], "values")[1]if(self.filesData) else None
+        self.customerId = self.customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]if(self.customerObject.whereData(aadhar=self.aadharEntryVar.get())) else None
+        self.dateApproved = self.filesTable.item(self.filesTable.selection()[0], "values")[1]if(self.filesData) else "1000-12-1"
+        
         self.guarranterId = self.fileObject.whereData(customerId=self.customerId, dateApproved=self.dateApproved)[0][10] if self.fileObject.whereData(customerId=self.customerId, dateApproved=self.dateApproved) else None
         self.guarranterdata = self.guarranterObject.whereData(id=self.guarranterId)
 
@@ -812,21 +925,35 @@ class Profile:
             self.deleteFileButton.config(state="normal")
             # self.loanPurposeEntry.config(state="disable")
         else:
+            self.statusLabel.config(text="Status : NULL")
+            self.loanTypeLabel.config(text="Loan Type : NULL")
+            self.amountApprovedVar.set("")
+            self.interestVar.set("")
+            self.numOfEmiVar.set("")
+            self.loanPeriodVar.set("")
+            self.installmentAmtVar.set("")
+            self.dateApprovedEntry.config(state="disable")
+            self.loanPurposeEntry.config(state="normal")
+            self.loanPurposeEntry.delete("1.0", "end")
+            self.loanPurposeEntry.insert("end", "")
             self.viewLedgerButton.config(state="disable")
             self.deleteFileButton.config(state="disable")
     
     def deleteFile(self):
-        sure = message.askyesno("Are you sure ? ", "Are you sure you want to \ndelete this file ?")
+        sure = message.askyesno("Are you sure ?", "Are you sure about deleting this \nfile. All data related to this file \nwill be deleted like vehicle details, ledger\n and guarranter details ? ")
+        
         if(sure):
             #ask password code
             message.showwarning("Warning", "The file will be deleted\n permanently.")
-            fileInfo = self.filesData[int(self.filesTable.selection()[0])-1]if(self.filesData) else None
-            if(fileInfo):
-                self.fileObject.deleteRow(id=fileInfo[0])
-                if(self.vehicleData):
-                    self.vehicleObject.deleteRow(id=self.vehicleData[0][0])
-                if(self.guarranterdata):
-                    self.guarranterObject.deleteRow(id=self.guarranterId)
+            fileDeleted = self.fileObject.deleteRow(id=self.fileId) if (self.fileId) else None
+            if(fileDeleted):
+                self.vehicleObject.deleteRow(id=self.vehicleData[0][0]) if (self.vehicleData) else None
+                self.guarranterObject.deleteRow(id=self.guarranterId) if (self.guarranterId) else None
+                self.filePageController()
+                self.refresh()
+            else:
+                message.showerror("Error","file didn't delete successfully.")
+                self.refresh()
 
     def dynamicFileDetailsController(self, event):
         pass
