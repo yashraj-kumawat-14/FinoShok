@@ -103,7 +103,7 @@ class Calculator:
         buttonMul = Button(buttonBox, text="*", width=5, height=2, bg=commandBg, fg=commandFg, font="COPPER 13 bold", command=lambda : self.operationAndNum("*"))
         buttonMul.grid(row=2, column=3, pady=1, padx=1)
         
-        buttondiv = Button(buttonBox, text="/", width=5, height=2, bg=commandBg, fg=commandFg, font="COPPER 13 bold", command=lambda : self.operationAndNum("/", self.displayVar))
+        buttondiv = Button(buttonBox, text="/", width=5, height=2, bg=commandBg, fg=commandFg, font="COPPER 13 bold", command=lambda : self.operationAndNum("/"))
         buttondiv.grid(row=3, column=3, pady=1, padx=1)
         
         buttonAns = Button(buttonBox, text="=", width=5, height=2, bg=commandBg, fg=commandFg, font="COPPER 13 bold", command=lambda: self.ans())

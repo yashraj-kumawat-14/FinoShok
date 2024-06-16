@@ -487,7 +487,7 @@ class AddFile:
                             fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
 
                             guarranterObject = Guarranter()
-                            guarranterInsertSuccessfully=guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), photo=self.pagesList[1].photoPath, status=1)
+                            guarranterInsertSuccessfully=guarranterObject.insertData(customer_id=customerId, name=self.pagesList[1].gNameVar.get(), father=self.pagesList[1].fNameVar.get(), mobile=self.pagesList[1].mobileVar.get(), home_address=self.pagesList[1].hAddressVar.get(), work_address=self.pagesList[1].wAddressVar.get(), aadhar=self.pagesList[1].aadharVar.get(), status=1)
 
                             documentObject = Document()
                             documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())

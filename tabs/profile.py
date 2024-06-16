@@ -10,6 +10,7 @@ from Customer import Customer
 from File import File
 from Guarranter import Guarranter
 from Vehicle import Vehicle
+from Document import Document
 from tkinter.filedialog import askopenfilename
 import tkinter.messagebox as message
 import shutil
@@ -80,6 +81,10 @@ class Profile:
         self.vehicleObject = Vehicle()
         self.vehicleData = None
 
+        #getting documente data
+        self.documentObject = Document()
+        self.documentData = None
+        
         #subframe1 work ends here
 
         #now invoking detailsConstroller method initiallly
@@ -222,7 +227,7 @@ class Profile:
         self.loanPurposeEntry = Text(self.fileDetailsFrameInner, height=1, width=15, state="disabled")
         self.loanPurposeEntry.grid(row=7, column=1, pady=3)
 
-        self.viewLedgerButton = Button(self.fileDetailsFrameInner, text="View Ledger", bg='green')
+        self.viewLedgerButton = Button(self.fileDetailsFrameInner, text="View Ledger", bg='light green')
         self.viewLedgerButton.grid(row=8, column=0, columnspan=2, sticky="we", pady=2)
 
         self.deleteFileButton = Button(self.fileDetailsFrameInner, text="Delete File ", bg="red")
@@ -432,6 +437,7 @@ class Profile:
         self.saveVehicleButton.grid(row=6, column=2, pady=5, sticky="ew")
         self.guarranterDetailsFrameController()
         self.vehicleDetailsFrameController()
+        self.filePageController()
         #work of vehicledetailsframe ends here
 
         #work of guarranterframe starts here 
@@ -784,6 +790,43 @@ class Profile:
             self.vehicleObject.updateData(id=vehicleId, name=self.vNameVar.get(), plateNum=self.numberPlateVar.get(),model=self.modelVar.get(), manufacturer=self.manufacturerVar.get(), fuel=self.fuelUsedVar.get(), engineCC=self.engineCCVar.get(), horsePowerBHP=self.horsePowerVar.get(), cyilenders=self.numCyilendersVar.get() ,fuelCapacity=self.fuelCapacityVar.get() ,seatingCapacity=self.seatingCapacityVar.get(), vehicleWeightKG=self.vehicleWeightVar.get())
             
             self.vehicleDetailsFrameController()
+
+    def filePageController(self):
+        fileInfo = self.filesData[int(self.filesTable.selection()[0])-1]if(self.filesData) else None
+        if(fileInfo):
+            self.statusLabel.config(text="Status : Active" if(fileInfo[5]==1) else "Status : Inactive", bg="light green"if(fileInfo[5]==1) else "red")
+            self.loanTypeLabel.config(text="Loan Type : Loan on vehicle" if(fileInfo[11]=="Loan on vehicles") else "Loan Type : Personal Loan")
+            self.amountApprovedVar.set(fileInfo[2])
+            self.interestVar.set(fileInfo[3])
+            self.numOfEmiVar.set(fileInfo[7])
+            self.loanPeriodVar.set(fileInfo[4])
+            self.installmentAmtVar.set(fileInfo[6])
+            self.dateApprovedEntry.config(state="normal")
+            self.dateApprovedEntry.set_date(fileInfo[9])
+            self.dateApprovedEntry.config(state="disable")
+            self.loanPurposeEntry.config(state="normal")
+            self.loanPurposeEntry.delete("1.0", "end")
+            self.loanPurposeEntry.insert("end", fileInfo[8])
+
+            self.viewLedgerButton.config(state="normal")
+            self.deleteFileButton.config(state="normal")
+            # self.loanPurposeEntry.config(state="disable")
+        else:
+            self.viewLedgerButton.config(state="disable")
+            self.deleteFileButton.config(state="disable")
+    
+    def deleteFile(self):
+        sure = message.askyesno("Are you sure ? ", "Are you sure you want to \ndelete this file ?")
+        if(sure):
+            #ask password code
+            message.showwarning("Warning", "The file will be deleted\n permanently.")
+            fileInfo = self.filesData[int(self.filesTable.selection()[0])-1]if(self.filesData) else None
+            if(fileInfo):
+                self.fileObject.deleteRow(id=fileInfo[0])
+                if(self.vehicleData):
+                    self.vehicleObject.deleteRow(id=self.vehicleData[0][0])
+                if(self.guarranterdata):
+                    self.guarranterObject.deleteRow(id=self.guarranterId)
 
     def dynamicFileDetailsController(self, event):
         pass
