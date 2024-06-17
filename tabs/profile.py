@@ -10,6 +10,7 @@ from Customer import Customer
 from File import File
 from Guarranter import Guarranter
 from Vehicle import Vehicle
+from Ledger import Ledger
 from Document import Document
 from tkinter.filedialog import askopenfilename
 import tkinter.messagebox as message
@@ -84,6 +85,9 @@ class Profile:
         #getting documente data
         self.documentObject = Document()
         self.documentData = None
+
+        #getting ledger data
+        self.ledgerObject = Ledger()
         
         #subframe1 work ends here
 
@@ -949,6 +953,11 @@ class Profile:
             if(fileDeleted):
                 self.vehicleObject.deleteRow(id=self.vehicleData[0][0]) if (self.vehicleData) else None
                 self.guarranterObject.deleteRow(id=self.guarranterId) if (self.guarranterId) else None
+                ledgerData = self.ledgerObject.whereData(fileId=self.fileId)
+                print(ledgerData)
+                for i in range(len(ledgerData)):
+                    self.ledgerObject.deleteRow(id=ledgerData[i][0])
+                
                 self.filePageController()
                 self.refresh()
             else:
