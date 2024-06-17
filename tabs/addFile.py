@@ -482,7 +482,7 @@ class AddFile:
                             numOfEmi = self.pagesList[4].numOfEmiVar.get()
                             dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
 
-                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Personal Loan", dateApproved=dateApproved)
 
                             fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
 
@@ -608,7 +608,7 @@ class AddFile:
                             numOfEmi = self.pagesList[4].numOfEmiVar.get()
                             dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
 
-                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Personal Loan", dateApproved=dateApproved)
 
                             fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
 
@@ -660,7 +660,7 @@ class AddFile:
                             numOfEmi = self.pagesList[4].numOfEmiVar.get()
                             dateApproved=str(self.pagesList[0].dateApprovedEntry.get_date().year)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().month)+"/"+str(self.pagesList[0].dateApprovedEntry.get_date().day)
 
-                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Loan on vehicles", dateApproved=dateApproved)
+                            fileInsertSuccessfully = fileObject.insertData(customerId=customerId, loanAmount=loanAmount, interest=interest, timePeriod=timePeriod, status="1", emiAmount=emiAmount, numEmi=numOfEmi,  note=self.purposeEntry.get('1.0', 'end'), loanType="Personal Loan", dateApproved=dateApproved)
 
                             fileId = fileObject.whereData(customerId=customerId, dateApproved=dateApproved)[0][0]
 
