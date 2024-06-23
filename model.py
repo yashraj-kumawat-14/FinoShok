@@ -63,7 +63,6 @@ class Model:
             #join function is a string method that concatenates the elements of an iterable such as list into a single string , using a specified separator.
             columns=" ,".join(columns)
 
-
             values=list()
             tempValues = list(data.values())
 

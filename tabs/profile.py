@@ -26,6 +26,7 @@ class Profile:
     def __init__(self, profileWindow, aadharNumber, updateStatus = None):
         #now assinging the value of aadharNumber to self.aadharNumber so that we can use it throughout the class without making it global
         self.aadharNumber = aadharNumber
+        self.fileId=None
 
         #initially assing the function updateStatus if given to self.updateStatus so to use it across the class
         self.updateStatus = updateStatus

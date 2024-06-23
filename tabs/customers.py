@@ -182,12 +182,16 @@ class Customers:
                 if(searchText.lower() in str(customer["aadhar"]).lower() or searchText.lower() in customer["name"].lower() or searchText.lower() in str(customer["mobile"]).lower()):
                     self.tempDataList.append(customer)
             iids = self.customerListBox.get_children()
-            for iid in iids:
-                self.customerListBox.delete(iid)
+            self.customerListBox.delete(*iids)
             count=0
-            for customer in self.tempDataList:
-                self.customerListBox.insert(parent="", text=count, index="end", iid=count, values=(customer["name"], customer["mobile"], customer["aadhar"]))
-                count+=1
+            if(self.tempDataList):
+                for customer in self.tempDataList:
+                    self.customerListBox.insert(parent="", text=count, index="end", iid=count, values=(customer["name"], customer["mobile"], customer["aadhar"]))
+                    count+=1
+                self.customerListBox.selection_set(0)
+                self.customerListBox.focus(0)
+                self.dynamicDetails()
+            
         else:
             iids = self.customerListBox.get_children()
             for iid in iids:
@@ -199,7 +203,7 @@ class Customers:
             self.tempDataList = self.dataList
 
     #this function dynamically changes details in detailframe according to the currentselection in customerlistbox
-    def dynamicDetails(self, event):
+    def dynamicDetails(self, event=None):
         if(self.customerListBox.focus()):
             #dynamic updating details and photo
 
@@ -232,7 +236,27 @@ class Customers:
                 #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
                 self.customerPhoto = ImageTk.PhotoImage(img)
                 self.customerPhotoLabel.config(image=self.customerPhoto)
-        
+            self.viewCustomerButton.config(state="normal")
+        else:
+             #dynamic updating details and photo
+
+            #setting empty data 
+            self.customerEntryVar.set("")
+            self.mobileEntryVar.set("")
+            self.aadharEntryVar.set("")
+
+            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+            img=Image.open(PhotoPath)
+            
+                #resizing the image
+            img=img.resize((82,80))
+
+            #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+            self.customerPhoto = ImageTk.PhotoImage(img)
+            self.customerPhotoLabel.config(image=self.customerPhoto)
+
+            self.viewCustomerButton.config(state="disabled")
+
     def refresh(self):
         #getting data from database
         data = Customer().readAllData()

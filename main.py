@@ -12,6 +12,8 @@ from tabs.about import About
 from tabs.customers import Customers
 from tabs.helpMenu import HelpMenu
 from tabs.profile import Profile
+from tabs.files import Files
+from tabs.ledger import Ledgers
 from tabs.addLoanRequest import AddLoanRequest
 
 from config.colorConfig import MAINFRAMECOLOR, TOOLFRAMECOLOR, TABCOLOR, TOOLFRAMECOLOR, STATUSBARCOLOR
@@ -28,6 +30,7 @@ class Finoshok:
         
         submenu.add_command(label="Add new file", command=self.addFile)
         submenu.add_command(label="Add Credit Request", command=self.addLoanRequest)
+        submenu.add_command(label="Files", command=self.files)
 
         #adding submenu in mainmenybar
         mainMenubar.add_cascade(menu=submenu, label="File")
@@ -88,6 +91,10 @@ class Finoshok:
 
         #creating a customerObjects variable because to hold Customer class objects
         self.customerObjects = []
+
+        #creating a filesObject variable because to hold Files class objects
+        self.filesObjects = []
+        self.viewLedgerObjects = []
 
         #creating a viewCustomerObjects variable because to hold Customers class objects
         self.viewCustomerObjects = []
@@ -201,13 +208,46 @@ class Finoshok:
             tabName = self.addTab(customerObject.customerEntryVar.get())
             #appending the Client object into viewCustomerObjects
             if(tabName):
-                self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus))
+                profileObject = Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus)
+                fileId = profileObject.fileId
+
+                if(fileId):
+                    profileObject.viewLedgerButton.config(command=lambda filesObject=None, fileId=fileId, name=customerObject.customerEntryVar.get():self.viewLedger(filesObject=filesObject, fileId=fileId, name=name))
+
+                self.viewCustomerObjects.append(profileObject)
         elif(kwargs["aadhar"] and kwargs["name"]):
             tabName = self.addTab(kwargs["name"])
             #appending the Client object into viewCustomerObjects
             if(tabName):
-                self.viewCustomerObjects.append(Profile(self.tabsDictionary[tabName], kwargs["aadhar"], updateStatus = self.updateStatus))
+                profileObject = Profile(self.tabsDictionary[tabName], kwargs["aadhar"], updateStatus = self.updateStatus)
+                fileId = profileObject.fileId
+                
+                if(fileId):
+                    profileObject.viewLedgerButton.config(command=lambda filesObject=None, fileId=fileId, name=customerObject.customerEntryVar.get():self.viewLedger(filesObject=filesObject, fileId=fileId, name=name))
+
+                self.viewCustomerObjects.append(profileObject)
     
+    def files(self):
+        tabName = self.addTab("Files", multiple=True)
+        # adding contents of Files class to the Files tab
+        tempObject =Files(self.tabsDictionary[tabName])
+        #configuring function for viewledgerbutton in Files Class
+        tempObject.viewLedgerButton.config(command=lambda filesObject=tempObject:self.viewLedger(filesObject=filesObject))
+        #now appending the tempObject to customerObjects
+        self.filesObjects.append(tempObject)
+
+    def viewLedger(self, filesObject=None, **kwargs):
+        if(filesObject):
+            tabName = self.addTab(filesObject.customerNameVar.get()+" file")
+            #appending the Client object into viewCustomerObjects
+            if(tabName):
+                self.viewLedgerObjects.append(Ledgers(parentWindow=self.tabsDictionary[tabName], fileId=filesObject.currentFileId, updateStatus = self.updateStatus))
+        elif(kwargs["fileId"] and kwargs["name"]):
+            tabName = self.addTab(kwargs["name"]+" file")
+            #appending the Client object into viewCustomerObjects
+            if(tabName):
+                self.viewLedgerObjects.append(Ledgers(parentWindow=self.tabsDictionary[tabName], fileId=kwargs["fileId"], updateStatus = self.updateStatus))
+
     #this functions changes status in stausbar and tabname's
     def updateStatus(self, **kwargs):
         data = kwargs

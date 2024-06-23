@@ -8,14 +8,17 @@ path.append(r"D:\projects\finoshok\finoshok\model")
 
 from File import File
 from Ledger import Ledger
+from Customer import Customer
 import tkinter.messagebox as message
 
 
 #AddFile class needs a parameter either a tk window or frame
 class Ledgers:
-    def __init__(self, parentWindow, fileId=None):
-
+    def __init__(self, parentWindow, fileId=None, updateStatus=None):
+        
+        self.updateStatus = updateStatus
         self.fileId = fileId
+        self.customerObject = Customer()
 
         #create mainframe containing everything
         self.mainFrame = Frame(master=parentWindow)
@@ -43,12 +46,23 @@ class Ledgers:
         self.headingFrame.columnconfigure(0, weight=1)
         self.headingFrame.columnconfigure(1, weight=1)
         self.headingFrame.columnconfigure(2, weight=1)
+        self.headingFrame.columnconfigure(3, weight=1)
+        self.headingFrame.columnconfigure(4, weight=1)
 
         self.ledgerLabel = Label(master=self.headingFrame, text="Ledger", font="COPPER 20 bold", bg="black", fg="orange")
         self.ledgerLabel.grid(row=0, column=0)
 
-        self.customerNameLabel = Label(master=self.headingFrame, text="Customer : ", font="COPPER 13 bold", fg="orange", bg="black")
-        self.customerNameLabel.grid(row=0, column=1)
+        self.customerLabel = Label(master=self.headingFrame, text="Customer : ", font="COPPER 13 bold", fg="orange", bg="black")
+        self.customerLabel.grid(row=0, column=1, sticky="e")
+
+        self.customerNameLabel = Label(master=self.headingFrame, text="", font="COPPER 13 bold", fg="yellow", bg="black")
+        self.customerNameLabel.grid(row=0, column=2, sticky="w")
+
+        self.customerIdLabel = Label(master=self.headingFrame, text="Customer Id : ", font="COPPER 13 bold", fg="orange", bg="black")
+        self.customerIdLabel.grid(row=0, column=3, sticky="e")
+
+        self.customerIdValueLabel = Label(master=self.headingFrame, text="", font="COPPER 13 bold", fg="yellow", bg="black")
+        self.customerIdValueLabel.grid(row=0, column=4, sticky="w")
 
         #creating a treeview table which will hold ledger data
         self.ledgerTable = ttk.Treeview(self.subFrame1)
@@ -108,7 +122,7 @@ class Ledgers:
         self.fileDetailsFrame.pack_propagate(False)
         self.fileDetailsFrame.grid_propagate(False)
 
-        self.ledgerDetailsFrame = Frame(self.subFrame2, relief="groove", border=1, width=100, height=100)
+        self.ledgerDetailsFrame = LabelFrame(self.subFrame2, relief="groove", border=1, width=100, height=100, text="Emi details", font="COPPER 17", labelanchor="n")
         self.ledgerDetailsFrame.pack(fill="both", expand=True)
         self.ledgerDetailsFrame.pack_propagate(False)
         self.ledgerDetailsFrame.grid_propagate(False)
@@ -312,12 +326,18 @@ class Ledgers:
         if(self.fileId==None):
             self.disableAll()
             return None
+        
+        
         items = self.ledgerTable.get_children()
         self.ledgerTable.delete(*items)
         self.fileObject = File()
         self.fileData = self.fileObject.whereData(id=self.fileId)
 
         if(self.fileData):
+            self.customerId= self.fileData[0][1]
+            self.customerName = self.customerObject.whereData(id=self.customerId)[0][1]
+            self.customerNameLabel.config(text=self.customerName)
+            self.customerIdValueLabel.config(text=str(self.customerId))
             print(self.fileData)
             self.amountApprovedVar.set(self.fileData[0][2])
             self.interestVar.set(self.fileData[0][3])
@@ -332,6 +352,7 @@ class Ledgers:
             self.loanPurposeEntry.insert("end", self.fileData[0][8])
             self.loanPurposeEntry.config(state='disabled')
             self.statusLabel.config(text="Status : Active" if (self.fileData[0][5]==1) else "Status : Inactive", bg="light green" if (self.fileData[0][5]==1) else "red")
+            self.loanTimeLabel.config(text="Pesonal Loan" if (self.fileData[0][11]=="Personal Loan") else "Vehicle Loan", bg="light green")
 
             self.ledgerObject = Ledger()
             self.ledgerData = self.ledgerObject.whereData(fileId=self.fileId)
@@ -425,5 +446,5 @@ if __name__=="__main__":
     root = Tk()
     root.title("Ledgers List ")
     root.geometry("1000x700")
-    ledgers = Ledgers(root, fileId=3)
+    ledgers = Ledgers(root, fileId=2)
     root.mainloop()

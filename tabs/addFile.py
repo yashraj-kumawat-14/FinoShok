@@ -388,7 +388,7 @@ class AddFile:
             if(self.pagesList[4].loanPassed):
                 if(self.pagesList[0].guarranterCheckVar.get()==1 and self.pagesList[0].typeOfLoanEntry.get()=="Loan on vehicle"):
                     if(self.pagesList[1].ok and self.pagesList[2].ok):
-                        if(self.pagesList[3].ok):
+                        if(self.pagesList[3].ok and self.pagesList[4].ok):
                             customerObject = Customer()
                             customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
 
@@ -458,6 +458,7 @@ class AddFile:
                                 
                                 message.showerror("Error", f"please contact developer for \nmore details")
                         else:
+                            self.pagesList[4].loanPassed=False
                             self.changePage(3)
                     else:
                         self.pagesList[4].loanPassed=False
@@ -470,7 +471,7 @@ class AddFile:
 
                 elif(self.pagesList[0].guarranterCheckVar.get()==1 and self.pagesList[0].typeOfLoanEntry.get()=="Personal Loan"):
                     if(self.pagesList[1].ok):
-                        if(self.pagesList[3].ok):
+                        if(self.pagesList[3].ok and self.pagesList[4].ok):
                             customerObject = Customer()
                             customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
 
@@ -525,6 +526,7 @@ class AddFile:
                                 
                                 message.showerror("Error", f"please contact developer for \nmore details")
                         else:
+                            self.pagesList[4].loanPassed=False
                             self.changePage(3)
                     else:
                         self.pagesList[4].loanPassed=False
@@ -533,7 +535,7 @@ class AddFile:
                             self.pagesList[1].checkData()
                 elif(self.pagesList[0].typeOfLoanEntry.get() == "Loan on vehicle" and not self.pagesList[0].guarranterCheckVar.get()):
                     if(self.pagesList[2].ok):
-                        if(self.pagesList[3].ok):
+                        if(self.pagesList[3].ok and self.pagesList[4].ok):
                             customerObject = Customer()
                             customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
 
@@ -588,6 +590,7 @@ class AddFile:
 
                                 message.showerror("Error", f"please contact developer for \nmore details")
                         else:
+                            self.pagesList[4].loanPassed=False
                             self.changePage(3)
                     else:
                         self.pagesList[4].loanPassed=False
@@ -596,7 +599,7 @@ class AddFile:
                             self.pagesList[2].checkData()
                 
                 elif(self.pagesList[0].typeOfLoanEntry.get() == "Personal Loan" and not self.pagesList[0].guarranterCheckVar.get()):
-                    if(self.pagesList[3].ok):
+                    if(self.pagesList[3].ok and self.pagesList[4].ok):
                             customerObject = Customer()
                             customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
 
@@ -645,10 +648,11 @@ class AddFile:
                                 
                                 message.showerror("Error", f"please contact developer for \nmore details")
                     else:
+                        self.pagesList[4].loanPassed=False
                         self.changePage(3)
                 elif(self.pagesList[0].typeOfLoanEntry.get() == "Personal Loan" and self.pagesList[0].guarranterCheckVar.get()):
                     if(self.pagesList[1].ok):
-                        if(self.pagesList[3].ok):
+                        if(self.pagesList[3].ok and self.pagesList[4].ok):
                             customerObject = Customer()
                             customerId = customerObject.whereData(aadhar=self.aadharEntryVar.get())[0][0]
 
@@ -703,6 +707,7 @@ class AddFile:
                                 
                                 message.showerror("Error", f"please contact developer for \nmore details")
                         else:
+                            self.pagesList[4].loanPassed=False
                             self.changePage(3)
                     else:
                         self.pagesList[4].loanPassed=False
@@ -710,6 +715,7 @@ class AddFile:
                         self.pagesList[1].checkData()
                 
             else:
+                self.pagesList[4].loanPassed=False
                 self.pagesList[4].enable()
         
 
@@ -1701,8 +1707,13 @@ class finalPage:
         self.table.heading("emiAmount", text="EMI Amount", anchor="center")
 
     def save(self):
-        self.loanPassed = True
-        self.updateStatus()
+        if(self.amountApprovedVar.get() and self.installmentAmtVar.get() and self.loanPeriodVar.get() and self.numOfEmiVar.get() and self.interestVar.get() and self.startDateEntry.get_date()):
+            self.loanPassed = True
+            self.ok =True
+            self.updateStatus()
+        else:
+            self.ok =False
+            self.instructionLabel.config(text = "fill necessary details")
         
     def updateStatus(self):
         if(self.parentUpdateStatus):
@@ -1758,6 +1769,7 @@ class finalPage:
             #inserting new data into the table
             day=self.startDateEntry.get_date().day
             month = self.startDateEntry.get_date().month
+            month = month+1 if month<12 else 1
             year = self.startDateEntry.get_date().year
 
             def addDays(year, month, day, n):

@@ -8,8 +8,7 @@ path.append(r"D:\projects\finoshok\finoshok\model")
 
 from File import File
 from Customer import Customer
-from Ledger import Ledger
-import tkinter.messagebox as message
+
 
 class Files:
     def __init__(self, parentWindow):
@@ -139,6 +138,12 @@ class Files:
         self.loanPurposeLabel = Label(self.fileDetailsFrameInner, text="Purpose : ")
         self.loanPurposeLabel.grid(row=7, column=0, sticky="e")
 
+        self.customerNameLabel = Label(self.fileDetailsFrameInner, text="Customer : ")
+        self.customerNameLabel.grid(row=8, column=0, sticky="e")
+
+        self.customerIdLabel = Label(self.fileDetailsFrameInner, text="Customer Id : ")
+        self.customerIdLabel.grid(row=9, column=0, sticky="e")
+
         self.amountApprovedVar = StringVar()
         self.amountApprovedEntry = Entry(self.fileDetailsFrameInner, textvariable=self.amountApprovedVar, justify="center", state="readonly")
         self.amountApprovedEntry.grid(row=1, column=1, sticky="e")
@@ -165,8 +170,16 @@ class Files:
         self.loanPurposeEntry = Text(self.fileDetailsFrameInner, height=1, width=15, state="disabled")
         self.loanPurposeEntry.grid(row=7, column=1, pady=3)
 
+        self.customerNameVar = StringVar()
+        self.customerNameEntry = Entry(self.fileDetailsFrameInner, textvariable=self.customerNameVar, justify="center", state="readonly")
+        self.customerNameEntry.grid(row=8, column=1)
+
+        self.customerIdVar = StringVar()
+        self.customerIdEntry = Entry(self.fileDetailsFrameInner, textvariable=self.customerIdVar, justify="center", state="readonly")
+        self.customerIdEntry.grid(row=9, column=1)
+
         self.viewLedgerButton = Button(self.fileDetailsFrameInner, text="View Ledger", bg='grey', fg="white")
-        self.viewLedgerButton.grid(row=8, column=0, columnspan=3, sticky="we", pady=10)
+        self.viewLedgerButton.grid(row=10, column=0, columnspan=3, sticky="we", pady=10)
 
         self.filesTable.bind("<<TreeviewSelect>>", self.dynamicFileDetailsController)
         self.searchFilesEntry.bind("<KeyRelease>", self.searchFiles)
@@ -179,12 +192,16 @@ class Files:
         if(self.tempFilesData):
             iid = self.filesTable.selection()[0]
             values = self.filesTable.item(iid, "values")
+            self.currentFileId = values[1]
             index = int(iid)-1
 
             self.amountApprovedVar.set(self.tempFilesData[index][2])
             self.interestVar.set(self.tempFilesData[index][3])
             self.numOfEmiVar.set(self.tempFilesData[index][7])
             self.loanPeriodVar.set(self.tempFilesData[index][4])
+            self.customerIdVar.set(self.tempFilesData[index][1])
+            customerName = self.customerObject.whereData(id=self.tempFilesData[index][1])[0][1]
+            self.customerNameVar.set(customerName)
             self.installmentAmtVar.set(self.tempFilesData[index][6])
 
             self.dateApprovedEntry.config(state='normal')
@@ -199,14 +216,18 @@ class Files:
             self.statusLabel.config(text="Status: Active" if (self.tempFilesData[index][5]==1) else "Status: Inactive", bg="light green" if (self.tempFilesData[index][5]==1) else "red")
 
             self.loanTypeLabel.config(text="vehicle loan" if (self.tempFilesData[index][11]=="Loan on vehicles") else "Personal Loan")
-            
+
             self.viewLedgerButton.config(state="normal")
         
         else:
+            print("yash")
+            self.currentFileId = None
             self.amountApprovedVar.set("")
             self.interestVar.set("")
             self.numOfEmiVar.set("")
             self.loanPeriodVar.set("")
+            self.customerIdVar.set("")
+            self.customerNameVar.set("")
             self.installmentAmtVar.set("")
 
             self.dateApprovedEntry.config(state='normal')
@@ -233,6 +254,7 @@ class Files:
             
         if(not self.filesData):
             self.disableAll()
+            self.refreshButton.config(state="normal")
             return None
             
         self.customerObject = Customer()
@@ -256,6 +278,8 @@ class Files:
         self.amountApprovedEntry.config(state="disabled")
         self.installmentAmtEntry.config(state="disabled")
         self.loanPurposeEntry.config(state="disabled")
+        self.customerIdEntry.config(state="disabled")
+        self.customerNameEntry.config(state="disabled")
         self.dateApprovedEntry.config(state="disabled")
 
     def enableAll(self):
@@ -268,6 +292,8 @@ class Files:
         self.amountApprovedEntry.config(state="normal")
         self.installmentAmtEntry.config(state="normal")
         self.loanPurposeEntry.config(state="normal")
+        self.customerIdEntry.config(state="normal")
+        self.customerNameEntry.config(state="normal")
         self.dateApprovedEntry.config(state="normal")
     
     def searchFiles(self, event=None):
