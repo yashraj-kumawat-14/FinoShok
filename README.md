@@ -22,13 +22,15 @@ To get started with FinoShok, follow these steps:
 
 1. Install dependencies: Ensure you have Python installed, then install required dependencies.
 
-In cmd type : pip install -r requirements.txt
+In cmd type : 
+
+pip install -r requirements.txt
 
 2. Setup the application: Execute the setup.py file one time only to initialize the application.python setup.py
 
 3. Run the application: Start the application by executing main.py.python main.py
 
-Usage
+## Usage
 
 Loan Processing: Navigate to the loan section to handle loan applications.
 
