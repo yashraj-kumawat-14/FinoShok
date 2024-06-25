@@ -9,6 +9,17 @@ FinoShok is a comprehensive microfinance software solution designed to streamlin
 - **Interest Calculation:** Automated and precise interest calculations.
 - **Reporting Tools:** Generate detailed financial reports to monitor performance.
 
+## Screenshots
+
+![M](images/screenshot1.png)
+*Main Dashboard*
+
+![Loan Application](images/screenshot2.png)
+*Loan Application Process*
+
+![Repayment Tracking](images/screenshot3.png)
+*Repayment Tracking Interface*
+
 ## Installation
 
 To get started with FinoShok, follow these steps:
