@@ -7,7 +7,7 @@ from sys import path
 import shutil
 path.append(r"D:\projects\finoshok\finoshok\model")
 path.append(r"D:\projects\finoshok\finoshok\config")
-from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH # ty
 #now we can import Customer and Request class successfully from customer model and Rewusts model respectively
 from Customer import Customer
 from File import File

@@ -68,8 +68,11 @@ class AddLoanRequest:
         self.aadharEntry = Entry(subFrame, textvariable=self.aadharVar, width=23, justify="center")
         self.aadharEntry.grid(row=0, column=1)
 
+        self.aadharEntryContextMenu = Menu(mainFrame, tearoff=0)
+        
+
         #event handler for aadhar entry to restrict user from entering more than 12 digits or letters, character and to insert name of client / borrower dynamically
-        def aadharEntryEventHandler(event):
+        def aadharEntryEventHandler(event=None):
             tempString = ""
             for char in self.aadharEntry.get():
                 if(not char.isdigit()):
@@ -91,10 +94,32 @@ class AddLoanRequest:
                         break
             else:
                 self.clientVar.set("")
+        
+        #nothing thinking
+
+        def cut():
+            self.aadharEntry.event_generate("<<Cut>>")
+
+        def copy():
+            self.aadharEntry.event_generate("<<Copy>>")
+
+        def paste():
+            self.aadharEntry.event_generate("<<Paste>>")
+            aadharEntryEventHandler()
+
+        def aadharEntryEventHandler2(event):
+            self.aadharEntryContextMenu.post(event.x_root, event.y_root)
+
+        self.aadharEntryContextMenu.add_command(label="Cut", command=cut)
+        self.aadharEntryContextMenu.add_command(label="Copy", command=copy)
+        self.aadharEntryContextMenu.add_command(label="Paste", command=paste)
             
 
         #binding the aadharentry to KeyRelease event with function as aadharentrtyevnthandler
         self.aadharEntry.bind("<KeyRelease>", aadharEntryEventHandler)
+
+        #binding the aadharentry to Buttion-3 event with function as aadharentrtyevnthandler2
+        self.aadharEntry.bind("<Button-3>", aadharEntryEventHandler2)
 
         self.clientVar = StringVar()
         self.clientCombobox = Entry(subFrame, textvariable=self.clientVar, width=23, justify="center", state="readonly")
