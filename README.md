@@ -26,6 +26,7 @@ In cmd type :
 
 ```bash
     pip install -r requirements.txt
+```
 
 2. Setup the application: Execute the setup.py file one time only to initialize the application.python setup.py
 
