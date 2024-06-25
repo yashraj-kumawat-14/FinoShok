@@ -24,7 +24,8 @@ To get started with FinoShok, follow these steps:
 
 In cmd type : 
 
-pip install -r requirements.txt
+```bash
+    pip install -r requirements.txt
 
 2. Setup the application: Execute the setup.py file one time only to initialize the application.python setup.py
 
