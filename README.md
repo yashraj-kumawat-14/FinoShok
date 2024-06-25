@@ -14,11 +14,14 @@ FinoShok is a comprehensive microfinance software solution designed to streamlin
 ![](images/1.jpg)
 
 
-![Loan Application](images/screenshot2.png)
-*Loan Application Process*
+![](images/2.jpg)
 
-![Repayment Tracking](images/screenshot3.png)
-*Repayment Tracking Interface*
+
+![](images/3.jpg)
+
+![](images/11.jpg)
+
+![](images/12.jpg)
 
 ## Installation
 
