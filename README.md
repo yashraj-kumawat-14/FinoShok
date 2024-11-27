@@ -66,6 +66,6 @@ Contribution:
 
 We welcome contributions to FinoShok! Please follow these steps to contribute:
 
-Fork the repository. Create a new branch (git checkout -b feature-branch). Commit your changes (git commit -am 'Add new feature'). Push to the branch (git push origin feature-branch). Create a new Pull Request. Contact For any inquiries or support, please contact us at yashrajkumawat7357@gmail.com . 
+Fork the repository. Create a new branch (git checkout -b feature-branch). Commit your changes (git commit -am 'Add new feature'). Push to the branch (git push origin feature-branch). Create a new Pull Request. Contact For any inquiries or support, please feel free to contact at yashrajkumawat7357@gmail.com . 
 
 Thank you for using FinoShok!
