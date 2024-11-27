@@ -42,9 +42,15 @@ In cmd type :
     pip install -r requirements.txt
 ```
 
-2. Setup the application: Execute the setup.py file one time only to initialize the application.python setup.py
+2. Setup the application: Execute the setup.py file one time only to initialize the application.
+   ```bash
+   python setup.py
+   ```
+3. Install mysql if not already installed.
 
-3. Run the application: Start the application by executing main.py.python main.py
+4. Set the username, password, and port in databaseConfig.py file located in config folder
+
+5. Run the application: Start the application by executing main.py.python main.py
 
 ## Usage
 
