@@ -1,0 +1,6 @@
+/.vscode/
+/assets/customerPhotos/*.jpg
+/assets/guarranterPhotos/*.jpg
+/assets/customerPhotos/*.png
+/assets/guarranterPhotos/*.png
+**/__pycache__/

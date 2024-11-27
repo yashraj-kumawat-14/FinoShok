@@ -23,6 +23,12 @@ cursor.execute("""CREATE TABLE IF NOT EXISTS `admins` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci""")
 
+cursor.execute("""INSERT INTO `admins` (
+  `id`,
+  `username`,
+  `password`
+) VALUES(1, 'root', 1234)""")
+
 #create customers table
 cursor.execute("""CREATE TABLE IF NOT EXISTS `customers` (
   `id` int NOT NULL AUTO_INCREMENT,

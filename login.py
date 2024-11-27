@@ -1,3 +1,10 @@
+from sys import path
+import os
+#adding this path search so that interpreter can search modules and import it from this directory 
+path.append(f"{os.path.dirname(os.path.abspath(__file__))}/config")
+from pathConfig import ALLPATHS
+path.extend(ALLPATHS)
+from databaseConfig import DATABASE, PASSWORD, USER
 from tkinter import *
 import mysql.connector as mysql
 
@@ -57,9 +64,9 @@ class Login:
     #here this function checks if the user and password matches in the users table
     def loginCheck(self, login_window, loginLabel):
         # global result
-        conn = mysql.connect(host="localhost", user="root", password="1234", database="users")
+        conn = mysql.connect(host="localhost", user=USER, password=PASSWORD, database=DATABASE)
         cursorobject = conn.cursor()
-        cursorobject.execute("select * from users where user = '{}' and password = '{}'".format(self.userVar.get(), self.passwordVar.get()))
+        cursorobject.execute("select * from admins where username = '{}' and password = '{}'".format(self.userVar.get(), self.passwordVar.get()))
         login_window.userDetail = cursorobject.fetchone()
         if(login_window.userDetail):
             login_window.result = True

@@ -270,18 +270,18 @@ class Finoshok:
 
 if __name__=="__main__":
     #login window 
-    # login_window = Tk()
-    # login_window.title("Login")
-    # login_window.geometry("200x200")
-    # login_window.resizable(False, False)
+    login_window = Tk()
+    login_window.title("Login")
+    login_window.geometry("200x200")
+    login_window.resizable(False, False)
     
-    # #passing login_window to login class to make working login window
-    # Login(login_window)
-    # login_window.mainloop()
+    #passing login_window to login class to make working login window
+    Login(login_window)
+    login_window.mainloop()
 
     # checking if the credentials are correct
-    # login_window.result
-    if(True):
+    
+    if(login_window.result):
         #initiating the gui
         root = Tk()
         root.geometry("1000x630")
