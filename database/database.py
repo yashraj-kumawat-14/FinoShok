@@ -9,13 +9,13 @@ path.extend(ALLPATHS)
 from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH, DEFAULTIMAGEPATH
 
 #importing necessary things present in databaseConfig.py file present in config folder
-from databaseConfig import HOSTNAME, USER, PASSWORD, DATABASE
+from databaseConfig import HOSTNAME, USER, PASSWORD, DATABASE, PORT
 
 class Database:
     def fetchData(self, query):
         print(query)
         #making connection with database
-        conn = mysql.connector.connect(host=HOSTNAME, user=USER, password=PASSWORD, database=DATABASE)
+        conn = mysql.connector.connect(host=HOSTNAME, user=USER, password=PASSWORD, database=DATABASE, port=PORT)
 
         #creating cursor to perform queries and get results
         cursor = conn.cursor()
