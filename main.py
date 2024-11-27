@@ -36,10 +36,10 @@ class Finoshok:
         mainMenubar.add_cascade(menu=submenu, label="File")
         
         #adding personal finance option in menu
-        mainMenubar.add_command(label="Personal Finance", command=self.personalFinance)
+        # mainMenubar.add_command(label="Personal Finance", command=self.personalFinance)
 
         #adding settings menu option
-        mainMenubar.add_command(label="Settings", command=lambda:self.addTab("Settings"))
+        # mainMenubar.add_command(label="Settings", command=lambda:self.addTab("Settings"))
 
         #about object made out from About class to show information related the software
         About(mainMenubar)
@@ -100,8 +100,10 @@ class Finoshok:
         self.viewCustomerObjects = []
 
         #creating uncloasable dashboard
-        self.addTab("Dashboard", closeBtn=False)
-        Dashboard(self.tabsDictionary["Dashboard"])
+        # self.addTab("Dashboard", closeBtn=False)
+        # Dashboard(self.tabsDictionary["Dashboard"])
+        self.customer()
+        self.addCustomer()
 
     #method or function to add tabs in myNotebook, it takes one parameter tabName which has store tab's name
     def addTab(self, tabName, multiple=False, closeBtn=True):
@@ -210,9 +212,11 @@ class Finoshok:
             if(tabName):
                 profileObject = Profile(self.tabsDictionary[tabName], customerObject.aadharEntryVar.get(), updateStatus = self.updateStatus)
                 fileId = profileObject.fileId
-
+                def ledgerViewkaro():
+                    print(profileObject.fileId)
+                    self.viewLedger(filesObject=None, fileId=profileObject.fileId, name=customerObject.customerEntryVar.get())
                 if(fileId):
-                    profileObject.viewLedgerButton.config(command=lambda filesObject=None, fileId=fileId, name=customerObject.customerEntryVar.get():self.viewLedger(filesObject=filesObject, fileId=fileId, name=name))
+                    profileObject.viewLedgerButton.config(command=ledgerViewkaro)
 
                 self.viewCustomerObjects.append(profileObject)
         elif(kwargs["aadhar"] and kwargs["name"]):
@@ -243,7 +247,7 @@ class Finoshok:
             if(tabName):
                 self.viewLedgerObjects.append(Ledgers(parentWindow=self.tabsDictionary[tabName], fileId=filesObject.currentFileId, updateStatus = self.updateStatus))
         elif(kwargs["fileId"] and kwargs["name"]):
-            tabName = self.addTab(kwargs["name"]+" file")
+            tabName = self.addTab(kwargs["name"]+" file", multiple=True)
             #appending the Client object into viewCustomerObjects
             if(tabName):
                 self.viewLedgerObjects.append(Ledgers(parentWindow=self.tabsDictionary[tabName], fileId=kwargs["fileId"], updateStatus = self.updateStatus))

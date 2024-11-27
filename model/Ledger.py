@@ -1,7 +1,7 @@
 #importing necessary modules
 import sys
 #adding this path to searcheable
-sys.path.append(r"D:\projects\finoshok\finoshok")
+sys.path.append(r"/home/yhj/Desktop/finoshok/model")
 from model import Model
 
 class Ledger(Model):

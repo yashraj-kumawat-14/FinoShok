@@ -9,6 +9,7 @@ conn = connector.connect(host=HOSTNAME, user=USER, password=PASSWORD)
 cursor = conn.cursor()
 
 #create database if not exists
+cursor.execute(f'drop database if exists {DATABASE}')
 cursor.execute(F"create database if not exists {DATABASE}")
 
 #selecting the database

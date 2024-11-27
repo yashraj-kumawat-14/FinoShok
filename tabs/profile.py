@@ -1,11 +1,16 @@
+from sys import path
+import os
+#adding this path search so that interpreter can search modules and import it from this directory 
+path.append(f"{os.path.dirname(os.path.abspath(__file__))}/../config")
+from pathConfig import ALLPATHS
+path.extend(ALLPATHS)
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH, DEFAULTIMAGEPATH
+
 #profile module shows the whole details and informations related to particular customer and its prvious, ongoing files
 
 #importing necessary modules nad theier components
 from tkinter import *
 from PIL import Image, ImageTk
-from sys import path
-#adding this path search so that interpreter can search modules and import it from this directory 
-path.append(r"D:\projects\finoshok\finoshok\model")
 from Customer import Customer
 from File import File
 from Guarranter import Guarranter
@@ -17,7 +22,6 @@ import tkinter.messagebox as message
 import shutil
 from tkinter import ttk
 from tkcalendar import DateEntry
-from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH
 
 
 #Profile class takes one tk Window or a Frame and aadharNumber of the particular customer to show it s profile
@@ -272,11 +276,11 @@ class Profile:
         self.stampDocLabel = Label(self.documentsFrameInner, text="Stamp")
         self.stampDocLabel.grid(row=4, column=0)
 
-        self.mobileDocLabel = Label(self.documentsFrameInner, text="Mobile no.")
-        self.mobileDocLabel.grid(row=5, column=0)
+        # self.mobileDocLabel = Label(self.documentsFrameInner, text="Mobile no.")
+        # self.mobileDocLabel.grid(row=5, column=0)
 
         self.rcDocLabel = Label(self.documentsFrameInner, text="RC")
-        self.rcDocLabel.grid(row=6, column=0)
+        self.rcDocLabel.grid(row=5, column=0)
 
         self.aadharReqVar = IntVar()
         self.aadharReqCheck = Checkbutton(self.documentsFrameInner, variable=self.aadharReqVar)
@@ -310,21 +314,21 @@ class Profile:
         self.stampVerifyCheck = Checkbutton(self.documentsFrameInner, variable=self.stampVerifyVar)
         self.stampVerifyCheck.grid(row=4, column=2)
 
-        self.mobileReqVar = IntVar()
-        self.mobileReqCheck = Checkbutton(self.documentsFrameInner, variable=self.mobileReqVar)
-        self.mobileReqCheck.grid(row=5, column=1)
+        # self.mobileReqVar = IntVar()
+        # self.mobileReqCheck = Checkbutton(self.documentsFrameInner, variable=self.mobileReqVar)
+        # self.mobileReqCheck.grid(row=5, column=1)
 
-        self.mobileVerifyVar = IntVar()
-        self.mobileVerifyCheck = Checkbutton(self.documentsFrameInner, variable=self.mobileVerifyVar)
-        self.mobileVerifyCheck.grid(row=5, column=2)
+        # self.mobileVerifyVar = IntVar()
+        # self.mobileVerifyCheck = Checkbutton(self.documentsFrameInner, variable=self.mobileVerifyVar)
+        # self.mobileVerifyCheck.grid(row=5, column=2)
 
         self.rcReqVar = IntVar()
         self.rcReqCheck = Checkbutton(self.documentsFrameInner, variable=self.rcReqVar)
-        self.rcReqCheck.grid(row=6, column=1)
+        self.rcReqCheck.grid(row=5, column=1)
 
         self.rcVerifyVar = IntVar()
         self.rcVerifyCheck = Checkbutton(self.documentsFrameInner, variable=self.rcVerifyVar)
-        self.rcVerifyCheck.grid(row=6, column=2)
+        self.rcVerifyCheck.grid(row=5, column=2)
 
         self.editDocumentsButton = Button(self.documentsFrameInner, text=' Edit ', command=self.enableDocument)
         self.editDocumentsButton.grid(row=7, column=0, sticky="ew")
@@ -494,6 +498,7 @@ class Profile:
 
     def documentDetailsController(self):
         self.documentData = self.documentObject.whereData(file_Id=self.fileId)
+        print(self.documentData)
         for item in self.documentData:
 
             if("aadhar" in item):
@@ -606,17 +611,28 @@ class Profile:
         self.guarranterPhotoLabel = Label(PhotoFrame)
         self.guarranterPhotoLabel.grid(row=0, column=0)
         try:
-            self.guarranterphotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\guarranterPhotos\\{self.guarranterId}.jpg"
-            img=Image.open(self.guarranterphotoPath)
-            
-            #resizing the image
-            img=img.resize((82,120))
+            if(self.guarranterId):
+                self.guarranterphotoPath = f"{GUARRANTERPHOTOPATH}/{self.guarranterId}.jpg"
+                img=Image.open(self.guarranterphotoPath)
+                
+                #resizing the image
+                img=img.resize((82,120))
 
-            #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
-            self.guarranterPhoto = ImageTk.PhotoImage(img)
-            self.guarranterPhotoLabel.config(image=self.guarranterPhoto)
+                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+                self.guarranterPhoto = ImageTk.PhotoImage(img)
+                self.guarranterPhotoLabel.config(image=self.guarranterPhoto)
+            else:
+                self.guarranterphotoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
+                img=Image.open(self.guarranterphotoPath)
+                
+                #resizing the image
+                img=img.resize((82,120))
+
+                #using ImageTk module's PhotoImage class so that to convert pil img object into a form that tkinter can understand
+                self.guarranterPhoto = ImageTk.PhotoImage(img)
+                self.guarranterPhotoLabel.config(image=self.guarranterPhoto)
         except:
-            self.guarranterphotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+            self.guarranterphotoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
             img=Image.open(self.guarranterphotoPath)
             
             #resizing the image
@@ -821,7 +837,7 @@ class Profile:
                 #if self.photopath is defined then copying image to the customerPhoto, it will replace the previous image with same name
                 try:
                     if(self.guarranterphotoPath):
-                        shutil.copy(self.guarranterphotoPath, f"{GUARRANTERPHOTOPATH}\\{self.guarranterdata[0][0]}.jpg")
+                        shutil.copy(self.guarranterphotoPath, f"{GUARRANTERPHOTOPATH}/{self.guarranterdata[0][0]}.jpg")
                         self.guarranterphotoPath=None
                 except:
                     self.guarranterphotoPath=None
@@ -912,6 +928,7 @@ class Profile:
     def filePageController(self):
         fileInfo = self.filesData[int(self.filesTable.selection()[0])-1]if(self.filesData) else None
         if(fileInfo):
+            self.fileId = self.filesData[int(self.filesTable.selection()[0])-1][0]
             self.statusLabel.config(text="Status : Active" if(fileInfo[5]==1) else "Status : Inactive", bg="light green"if(fileInfo[5]==1) else "red")
             self.loanTypeLabel.config(text="Loan Type : Loan on vehicle" if(fileInfo[11]=="Loan on vehicles") else "Loan Type : Personal Loan")
             self.amountApprovedVar.set(fileInfo[2])
@@ -966,7 +983,8 @@ class Profile:
                 self.refresh()
 
     def dynamicFileDetailsController(self, event):
-        pass
+        self.filePageController()
+        self.documentDetailsController()
 
     def detailsFrameController(self):
 
@@ -1008,7 +1026,7 @@ class Profile:
         self.customerPhotoLabel = Label(PhotoFrame)
         self.customerPhotoLabel.grid(row=0, column=0)
         try:
-            self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.data[0][0]}.jpg"
+            self.photoPath = f"{CUSTOMERPHOTOPATH}/{self.data[0][0]}.jpg"
             img=Image.open(self.photoPath)
             
             #resizing the image
@@ -1018,7 +1036,7 @@ class Profile:
             self.customerPhoto = ImageTk.PhotoImage(img)
             self.customerPhotoLabel.config(image=self.customerPhoto)
         except:
-            self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+            self.photoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
             img=Image.open(self.photoPath)
             
             #resizing the image
@@ -1208,7 +1226,7 @@ class Profile:
 
                 #if self.photopath is defined then copying image to the customerPhoto, it will replace the previous image with same name
                 if(self.photoPath):
-                    shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{self.data[0][0]}.jpg")
+                    shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}/{self.data[0][0]}.jpg")
 
                 #updating self.data 
                 self.data = customerObject.whereData(id=self.data[0][0])

@@ -1,13 +1,17 @@
+from sys import path
+import os
+#adding this path search so that interpreter can search modules and import it from this directory 
+path.append(f"{os.path.dirname(os.path.abspath(__file__))}/../config")
+from pathConfig import ALLPATHS
+path.extend(ALLPATHS)
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH, DEFAULTIMAGEPATH
+
 #importing necessary modules and components and clases
 from tkinter import Tk, Frame, Label, Listbox, Scrollbar, END, Checkbutton, IntVar, StringVar, Entry, Button, Text, ttk,  DoubleVar
 from tkinter.filedialog import askopenfilename
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
-from sys import path
 import shutil
-path.append(r"D:\projects\finoshok\finoshok\model")
-path.append(r"D:\projects\finoshok\finoshok\config")
-from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH # ty
 #now we can import Customer and Request class successfully from customer model and Rewusts model respectively
 from Customer import Customer
 from File import File
@@ -282,7 +286,9 @@ class AddFile:
         if(self.customerRequestBox.focus() and self.dataList[int(self.customerRequestBox.focus())]["status"]==1):
             #trying to show photo of customer
             try:
-                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.dataList[int(self.customerRequestBox.focus())]["customerId"]}.jpg"
+                self.photoPath = f"{CUSTOMERPHOTOPATH}/{self.dataList[int(self.customerRequestBox.focus())]['customerId']}.jpg"
+
+                # self.photoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
                 img=Image.open(self.photoPath)
                 
                 #resizing the image
@@ -292,7 +298,7 @@ class AddFile:
                 self.customerPhoto = ImageTk.PhotoImage(img)
                 self.customerPhotoLabel.config(image=self.customerPhoto)
             except:
-                self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+                self.photoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
                 img=Image.open(self.photoPath)
                 
                 #resizing the image
@@ -320,7 +326,7 @@ class AddFile:
             #performing cancel method
             self.cancelMethod()
         else:
-            self.photoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+            self.photoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
             img=Image.open(self.photoPath)
                 
             #resizing the image
@@ -413,8 +419,8 @@ class AddFile:
                             fileObject.updateData(id=fileId, guarranterId=guarranterId)
 
 
-                            if(self.photoPath):
-                                shutil.copy(self.photoPath, f"{GUARRANTERPHOTOPATH}\\{guarranterId}.jpg")
+                            if(self.pagesList[1].photopath):
+                                shutil.copy(self.pagesList[1].photopath, f"{GUARRANTERPHOTOPATH}/{guarranterId}.jpg")
 
                             documentObject = Document()
                             documentObject.insertData(customer_id=customerId, doc_name="aadhar", required=self.pagesList[3].aadharReqVar.get(), verified=self.pagesList[3].aadharVerifyVar.get(), file_id=fileId, status=self.pagesList[3].aadharVerifyVar.get())
@@ -1180,11 +1186,11 @@ class DocVerifyPage:
         self.stampDocLabel = Label(self.documentsFrame, text="Stamp")
         self.stampDocLabel.grid(row=4, column=0)
 
-        self.mobileDocLabel = Label(self.documentsFrame, text="Mobile no.")
-        self.mobileDocLabel.grid(row=5, column=0)
+        # self.mobileDocLabel = Label(self.documentsFrame, text="Mobile no.")
+        # self.mobileDocLabel.grid(row=5, column=0)
 
         self.rcDocLabel = Label(self.documentsFrame, text="RC")
-        self.rcDocLabel.grid(row=6, column=0)
+        self.rcDocLabel.grid(row=5, column=0)
 
         self.aadharReqVar = IntVar()
         self.aadharReqCheck = Checkbutton(self.documentsFrame, variable=self.aadharReqVar)
@@ -1218,24 +1224,24 @@ class DocVerifyPage:
         self.stampVerifyCheck = Checkbutton(self.documentsFrame, variable=self.stampVerifyVar)
         self.stampVerifyCheck.grid(row=4, column=2)
 
-        self.mobileReqVar = IntVar()
-        self.mobileReqCheck = Checkbutton(self.documentsFrame, variable=self.mobileReqVar)
-        self.mobileReqCheck.grid(row=5, column=1)
+        # self.mobileReqVar = IntVar()
+        # self.mobileReqCheck = Checkbutton(self.documentsFrame, variable=self.mobileReqVar)
+        # self.mobileReqCheck.grid(row=5, column=1)
 
-        self.mobileVerifyVar = IntVar()
-        self.mobileVerifyCheck = Checkbutton(self.documentsFrame, variable=self.mobileVerifyVar)
-        self.mobileVerifyCheck.grid(row=5, column=2)
+        # self.mobileVerifyVar = IntVar()
+        # self.mobileVerifyCheck = Checkbutton(self.documentsFrame, variable=self.mobileVerifyVar)
+        # self.mobileVerifyCheck.grid(row=5, column=2)
 
         self.rcReqVar = IntVar()
         self.rcReqCheck = Checkbutton(self.documentsFrame, variable=self.rcReqVar)
-        self.rcReqCheck.grid(row=6, column=1)
+        self.rcReqCheck.grid(row=5, column=1)
 
         self.rcVerifyVar = IntVar()
         self.rcVerifyCheck = Checkbutton(self.documentsFrame, variable=self.rcVerifyVar)
-        self.rcVerifyCheck.grid(row=6, column=2)
+        self.rcVerifyCheck.grid(row=5, column=2)
 
         self.okButton = Button(self.documentsFrame, text="Ok", command=self.checkData)
-        self.okButton.grid(row=7, column=1, sticky="we")
+        self.okButton.grid(row=6, column=1, sticky="we")
             
     def updateStatus(self):
         if(self.parentUpdateStatus):
@@ -1250,8 +1256,8 @@ class DocVerifyPage:
         self.pancardVerifyCheck.config(state="disable")
         self.stampReqCheck.config(state="disable")
         self.stampVerifyCheck.config(state="disable")
-        self.mobileReqCheck.config(state="disable")
-        self.mobileVerifyCheck.config(state="disable")
+        # self.mobileReqCheck.config(state="disable")
+        # self.mobileVerifyCheck.config(state="disable")
         self.chequeReqCheck.config(state="disable")
         self.chequeVerifyCheck.config(state="disable")
         self.okButton.config(state="disable")
@@ -1267,8 +1273,8 @@ class DocVerifyPage:
         self.pancardVerifyCheck.config(state="disable")
         self.stampReqCheck.config(state="disable")
         self.stampVerifyCheck.config(state="disable")
-        self.mobileReqCheck.config(state="disable")
-        self.mobileVerifyCheck.config(state="disable")
+        # self.mobileReqCheck.config(state="disable")
+        # self.mobileVerifyCheck.config(state="disable")
         self.chequeReqCheck.config(state="disable")
         self.chequeVerifyCheck.config(state="disable")
         self.okButton.config(state="disable")
@@ -1282,8 +1288,8 @@ class DocVerifyPage:
         self.pancardVerifyCheck.config(state="normal")
         self.stampReqCheck.config(state="normal")
         self.stampVerifyCheck.config(state="normal")
-        self.mobileReqCheck.config(state="normal")
-        self.mobileVerifyCheck.config(state="normal")
+        # self.mobileReqCheck.config(state="normal")
+        # self.mobileVerifyCheck.config(state="normal")
         self.chequeReqCheck.config(state="normal")
         self.chequeVerifyCheck.config(state="normal")
         self.okButton.config(state="normal")
@@ -1299,8 +1305,8 @@ class DocVerifyPage:
         self.stampReqVar.set(0)
         self.stampVerifyVar.set(0)
         self.ok=False
-        self.mobileReqVar.set(0)
-        self.mobileVerifyVar.set(0)
+        # self.mobileReqVar.set(0)
+        # self.mobileVerifyVar.set(0)
         self.rcReqVar.set(0)
         self.rcVerifyVar.set(0)
         self.disable()

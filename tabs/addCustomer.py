@@ -1,8 +1,11 @@
 #importing only necessary classes and things from library
-import sys
-sys.path.append(r"D:\projects\finoshok\finoshok\model")
-sys.path.append(r"D:\projects\finoshok\finoshok\config")
-from pathConfig import CUSTOMERPHOTOPATH
+from sys import path
+import os
+#adding this path search so that interpreter can search modules and import it from this directory 
+path.append(f"{os.path.dirname(os.path.abspath(__file__))}/../config")
+from pathConfig import ALLPATHS
+path.extend(ALLPATHS)
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH, DEFAULTIMAGEPATH
 from Customer import Customer
 from tkinter import Tk, Frame, Label, Entry, Button, Checkbutton, IntVar, END
 from tkinter.filedialog import askopenfilename
@@ -238,7 +241,7 @@ class AddCustomer:
                             #saving image as customerId.jpg
                             print(self.photoPath, "second")
                             customerId = customerObject.whereData(aadhar=self.aadharEntry.get())[0][0]
-                            shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}\\{customerId}.jpg")
+                            shutil.copy(self.photoPath, f"{CUSTOMERPHOTOPATH}/{customerId}.jpg")
                             print(self.photoPath, "third")
                             
 

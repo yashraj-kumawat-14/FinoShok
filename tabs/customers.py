@@ -1,9 +1,14 @@
+from sys import path
+import os
+#adding this path search so that interpreter can search modules and import it from this directory 
+path.append(f"{os.path.dirname(os.path.abspath(__file__))}/../config")
+from pathConfig import ALLPATHS
+path.extend(ALLPATHS)
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH, DEFAULTIMAGEPATH
 #Customers module to show list of customers present in the database using customer model
 from tkinter import Tk, Frame, Listbox, Scrollbar, Label, Entry, Button, END, StringVar
 from PIL import Image, ImageTk
 #importign sys.path so that we can add model folder to search path
-from sys import path
-path.append(r"D:\projects\finoshok\finoshok\model")
 #now we can import Customer class successfully from customer model
 from Customer import Customer
 from tkinter import ttk
@@ -114,7 +119,7 @@ class Customers:
         PhotoFrame.columnconfigure(0, weight=1)
 
         #creating a PIL image object
-        initialPhotoPath = r"D:\projects\finoshok\finoshok\assets\defaultImages\user.jpg"
+        initialPhotoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
         img=Image.open(initialPhotoPath)
         
         #resizing the image
@@ -214,7 +219,9 @@ class Customers:
             self.aadharEntryVar.set(values[2])
 
             #creating a PIL image object
-            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\customerPhotos\\{self.tempDataList[int(self.customerListBox.item(self.customerListBox.focus(), "text"))]["id"]}.jpg"
+            PhotoPath = f"{CUSTOMERPHOTOPATH}/{self.tempDataList[int(self.customerListBox.item(self.customerListBox.focus(), 'text'))]['id']}.jpg"
+
+            # PhotoPath = f"/home/yhj/Desktop/finoshok/assets/defaultImages/user.jpg"
 
             # if error found during imaging loading then use default image
             try:
@@ -245,7 +252,7 @@ class Customers:
             self.mobileEntryVar.set("")
             self.aadharEntryVar.set("")
 
-            PhotoPath = f"D:\\projects\\finoshok\\finoshok\\assets\\defaultImages\\user.jpg"
+            PhotoPath = f"{DEFAULTIMAGEPATH}/user.jpg"
             img=Image.open(PhotoPath)
             
                 #resizing the image

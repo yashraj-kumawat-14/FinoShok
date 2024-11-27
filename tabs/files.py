@@ -3,8 +3,12 @@ from tkinter import *
 from tkinter import ttk
 from tkcalendar import DateEntry
 from sys import path
-
-path.append(r"D:\projects\finoshok\finoshok\model")
+import os
+#adding this path search so that interpreter can search modules and import it from this directory 
+path.append(f"{os.path.dirname(os.path.abspath(__file__))}/../config")
+from pathConfig import ALLPATHS
+path.extend(ALLPATHS)
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH, DEFAULTIMAGEPATH
 
 from File import File
 from Customer import Customer

@@ -1,9 +1,12 @@
 #importing necessary modules and variables
 import mysql.connector 
-import sys #importing sys module so that we can add config folder to search path
-
-#adding config folder to search path
-sys.path.append(r"D:\projects\finoshok\finoshok\config")
+from sys import path
+import os
+#adding this path search so that interpreter can search modules and import it from this directory 
+path.append(f"{os.path.dirname(os.path.abspath(__file__))}/../config")
+from pathConfig import ALLPATHS
+path.extend(ALLPATHS)
+from pathConfig import CUSTOMERPHOTOPATH, GUARRANTERPHOTOPATH, DEFAULTIMAGEPATH
 
 #importing necessary things present in databaseConfig.py file present in config folder
 from databaseConfig import HOSTNAME, USER, PASSWORD, DATABASE
