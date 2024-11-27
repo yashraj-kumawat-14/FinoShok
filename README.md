@@ -66,8 +66,6 @@ Contribution:
 
 We welcome contributions to FinoShok! Please follow these steps to contribute:
 
-Fork the repository.Create a new branch (git checkout -b feature-branch).Commit your changes (git commit -am 'Add new feature').Push to the branch (git push origin feature-branch).Create a new Pull Request. ContactFor any inquiries or support, please contact us at yashrajkumawat7357@gmail.com . 
+Fork the repository. Create a new branch (git checkout -b feature-branch). Commit your changes (git commit -am 'Add new feature'). Push to the branch (git push origin feature-branch). Create a new Pull Request. Contact For any inquiries or support, please contact us at yashrajkumawat7357@gmail.com . 
 
 Thank you for using FinoShok!
-
-This `README.md` provides a comprehensive overview of your microfinance software, including features, installation instructions, usage, contributing guidelines, and contact information. Feel free to adjust the details, especially the repository URL and contact information, to match your specific project setup.
